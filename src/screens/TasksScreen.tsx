@@ -13,7 +13,7 @@ const defaultData:Task[]=[
   {id:'4',title:'Замена колодок',categories:['urgent'],done:false,createdAt:new Date().toISOString(),subtasks:[{id:'4a',title:'Заказать колодки',done:false},{id:'4b',title:'Сервис 18:00',done:false}]}
 ];
 
-const filters:{key:'all'|CategoryKey,label:string}[]=[{key:'all',label:'Все'},{key:'work',label:'Работа'},{key:'home',label:'Дом'},{key:'global',label:'Глобальное'},{key:'habit',label:'Повтор'},{key:'personal',label:'Личное'},{key:'urgent',label:'Срочно'}];
+const LABELS:Record<CategoryKey,string>={work:'Работа',home:'Дом',global:'Глобальное',habit:'Повтор',personal:'Личное',urgent:'Срочно'};
 
 export default function TasksScreen(){
 const[tasks,setTasks]=useState<Task[]>([]);
@@ -52,9 +52,12 @@ return(
       <Text style={styles.h1}>Задачи</Text>
       <Text style={styles.caption}>Всего: {list.length} • Активных: {list.filter(t=>!t.done).length}</Text>
       <View style={styles.filters}>
-        {filters.map(f=>(
-          <TouchableOpacity key={f.key} style={[styles.fbtn,filter===f.key&&styles.fbtnOn]} onPress={()=>setFilter(f.key)}>
-            <Text style={[styles.ftext,filter===f.key&&styles.ftextOn]}>{f.label}</Text>
+        <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
+          <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
+        </TouchableOpacity>
+        {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
+          <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
+            <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{LABELS[c as CategoryKey]||String(c)}</Text>
           </TouchableOpacity>
         ))}
       </View>
