@@ -12,8 +12,11 @@ export interface Task {
   categories: CategoryKey[]; // поддержка нескольких категорий
   dueAt?: string;
   repeat?: 'daily'|'weekly'|'monthly'|null;
+  reminderMinutesBefore?: number;
+  priority?: 'low'|'medium'|'high';
   notes?: string;
   subtasks?: Subtask[];
   done: boolean;
   createdAt: string;
+  updatedAt?: string;
 }

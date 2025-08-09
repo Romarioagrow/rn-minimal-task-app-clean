@@ -194,7 +194,8 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                   notes:notes.trim()||undefined,
                   categories:categories.length?categories:['personal'],
                   repeat:repeat??null,
-                  subtasks:subtasks.filter(s=>s.title.trim().length>0)
+                  subtasks:subtasks.filter(s=>s.title.trim().length>0),
+                  updatedAt:new Date().toISOString()
                 })}><Text style={{color:colors.accent,fontWeight:'800'}}>Сохранить</Text></TouchableOpacity>
               </View>
             </View>
