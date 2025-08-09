@@ -43,11 +43,11 @@ return(
       </View>
       <FlatList data={list} keyExtractor={i=>i.id} renderItem={({item})=>(<TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub}/>)} contentContainerStyle={{paddingBottom:spacing(12)}}/>
       <TouchableOpacity style={styles.fab} onPress={()=>{
-        // Открываем редактор с черновиком, НЕ добавляя задачу в список до сохранения
+        // Открываем редактор с черновиком без категорий по умолчанию
         const draft:Task={
           id:String(Date.now()),
           title:'',
-          categories:['personal'],
+          categories:[],
           done:false,
           createdAt:new Date().toISOString(),
           subtasks:[]
@@ -108,7 +108,7 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
   const [dueDate,setDueDate]=useState<string>(task.dueAt?new Date(task.dueAt).toISOString().slice(0,10):'');
   const [dueTime,setDueTime]=useState<string>(task.dueAt?new Date(task.dueAt).toTimeString().slice(0,5):'');
   const [reminder,setReminder]=useState<number|undefined>(task.reminderMinutesBefore);
-  const [priority,setPriority]=useState<Task['priority']>(task.priority||'low');
+  const [priority,setPriority]=useState<Task['priority']>(task.priority??null);
   const [subtasks,setSubtasks]=useState(task.subtasks||[]);
   const [repeatOpen,setRepeatOpen]=useState(false);
 
@@ -228,17 +228,17 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setPriorityOpen(v=>!v)}>
                 <Text style={editorStyles.settingsLabel}>Приоритет:</Text>
                 <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
-                  <Text style={editorStyles.settingsValue}>{priority==='high'?'Высокий':priority==='medium'?'Средний':'Низкий'}</Text>
+                  <Text style={editorStyles.settingsValue}>{priority===null?'Нет':priority==='high'?'Высокий':priority==='medium'?'Средний':'Низкий'}</Text>
                   <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
                 </View>
               </TouchableOpacity>
               {priorityOpen?(
                 <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1)}}>
-                  {(['low','medium','high'] as NonNullable<Task['priority']>[]).map(p=>{
+                  {([null,'low','medium','high'] as (Task['priority'])[]).map(p=>{
                     const on=priority===p;
-                    const label=p==='high'?'Высокий':p==='medium'?'Средний':'Низкий';
+                    const label=p===null?'Нет':p==='high'?'Высокий':p==='medium'?'Средний':'Низкий';
                     return (
-                      <TouchableOpacity key={p} onPress={()=>setPriority(p)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
+                      <TouchableOpacity key={String(p)} onPress={()=>setPriority(p)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
                         <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{label}</Text>
                       </TouchableOpacity>
                     );
@@ -278,7 +278,7 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                   ...task,
                   title:title.trim()||'Новая задача',
                   notes:notes.trim()||undefined,
-                  categories:categories.length?categories:['personal'],
+                  categories:categories,
                   repeat:repeat??null,
                   dueAt:(dueDate&&dueTime)?`${dueDate}T${dueTime}:00` : undefined,
                   reminderMinutesBefore: typeof reminder==='number'?reminder:undefined,
