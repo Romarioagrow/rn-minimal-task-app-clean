@@ -102,6 +102,13 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
   const [notes,setNotes]=useState(task.notes||'');
   const [categories,setCategories]=useState<CategoryKey[]>(task.categories);
   const [repeat,setRepeat]=useState<Task['repeat']>(task.repeat??null);
+  const [dueOpen,setDueOpen]=useState(false);
+  const [remindOpen,setRemindOpen]=useState(false);
+  const [priorityOpen,setPriorityOpen]=useState(false);
+  const [dueDate,setDueDate]=useState<string>(task.dueAt?new Date(task.dueAt).toISOString().slice(0,10):'');
+  const [dueTime,setDueTime]=useState<string>(task.dueAt?new Date(task.dueAt).toTimeString().slice(0,5):'');
+  const [reminder,setReminder]=useState<number|undefined>(task.reminderMinutesBefore);
+  const [priority,setPriority]=useState<Task['priority']>(task.priority||'low');
   const [subtasks,setSubtasks]=useState(task.subtasks||[]);
   const [repeatOpen,setRepeatOpen]=useState(false);
 
@@ -118,6 +125,20 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
   };
 
   const repeatLabel=(r:Task['repeat'])=>r===null?'Нет':r==='daily'?'Ежедневно':r==='weekly'?'Еженедельно':'Ежемесячно';
+  const formatDateTime=(dateStr:string,timeStr:string)=>{
+    if(!dateStr||!timeStr) return 'Не задано';
+    try{
+      const d=new Date(`${dateStr}T${timeStr}:00`);
+      const now=new Date();
+      const isToday=d.toDateString()===now.toDateString();
+      const tomorrow=new Date(now); tomorrow.setDate(now.getDate()+1);
+      const isTomorrow=d.toDateString()===tomorrow.toDateString();
+      const time=timeStr;
+      if(isToday) return `Сегодня, ${time}`;
+      if(isTomorrow) return `Завтра, ${time}`;
+      return `${d.toLocaleDateString()}, ${time}`;
+    }catch{ return 'Не задано'; }
+  };
 
   return (
     <View style={editorStyles.backdrop}>
@@ -140,6 +161,28 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
             </View>
 
             <View style={editorStyles.settingsCard}>
+              {/* Дата и время */}
+              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setDueOpen(v=>!v)}>
+                <Text style={editorStyles.settingsLabel}>Дата и время:</Text>
+                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                  <Text style={editorStyles.settingsValue}>{formatDateTime(dueDate,dueTime)}</Text>
+                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                </View>
+              </TouchableOpacity>
+              {dueOpen?(
+                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),gap:spacing(1)}}>
+                  <Input value={dueDate} onChangeText={setDueDate} placeholder="YYYY-MM-DD"/>
+                  <Input value={dueTime} onChangeText={setDueTime} placeholder="HH:mm"/>
+                  <View style={{flexDirection:'row',gap:spacing(2)}}>
+                    <TouchableOpacity onPress={()=>{ const d=new Date(); d.setMinutes(d.getMinutes()+60); setDueDate(d.toISOString().slice(0,10)); setDueTime(d.toTimeString().slice(0,5)); }}>
+                      <Text style={{color:colors.accent,fontWeight:'700'}}>+1 час</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{ setDueDate(''); setDueTime(''); }}>
+                      <Text style={{color:colors.subtext}}>Очистить</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ):null}
               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>{setRepeatOpen(v=>!v);}} onLongPress={cycleRepeat}>
                 <Text style={editorStyles.settingsLabel}>Повторение:</Text>
                 <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
@@ -154,6 +197,49 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                     return (
                       <TouchableOpacity key={String(r)} onPress={()=>setRepeat(r)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
                         <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{repeatLabel(r)}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ):null}
+
+              {/* Напоминание */}
+              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setRemindOpen(v=>!v)}>
+                <Text style={editorStyles.settingsLabel}>Напоминание:</Text>
+                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                  <Text style={editorStyles.settingsValue}>{typeof reminder==='number'?`За ${reminder} мин`:'Нет'}</Text>
+                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                </View>
+              </TouchableOpacity>
+              {remindOpen?(
+                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1),flexWrap:'wrap'}}>
+                  {[null,5,10,30,60].map((m)=>{
+                    const on=reminder===m as any;
+                    return (
+                      <TouchableOpacity key={String(m)} onPress={()=>setReminder(m as any)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
+                        <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{m===null?'Нет':`За ${m} мин`}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ):null}
+
+              {/* Приоритет */}
+              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setPriorityOpen(v=>!v)}>
+                <Text style={editorStyles.settingsLabel}>Приоритет:</Text>
+                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                  <Text style={editorStyles.settingsValue}>{priority==='high'?'Высокий':priority==='medium'?'Средний':'Низкий'}</Text>
+                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                </View>
+              </TouchableOpacity>
+              {priorityOpen?(
+                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1)}}>
+                  {(['low','medium','high'] as NonNullable<Task['priority']>[]).map(p=>{
+                    const on=priority===p;
+                    const label=p==='high'?'Высокий':p==='medium'?'Средний':'Низкий';
+                    return (
+                      <TouchableOpacity key={p} onPress={()=>setPriority(p)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
+                        <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{label}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -194,6 +280,9 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                   notes:notes.trim()||undefined,
                   categories:categories.length?categories:['personal'],
                   repeat:repeat??null,
+                  dueAt:(dueDate&&dueTime)?`${dueDate}T${dueTime}:00` : undefined,
+                  reminderMinutesBefore: typeof reminder==='number'?reminder:undefined,
+                  priority:priority||undefined,
                   subtasks:subtasks.filter(s=>s.title.trim().length>0),
                   updatedAt:new Date().toISOString()
                 })}><Text style={{color:colors.accent,fontWeight:'800'}}>Сохранить</Text></TouchableOpacity>
