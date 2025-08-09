@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useState}from'react';
+import React,{useEffect,useMemo,useState,useCallback}from'react';
 import{View,Text,StyleSheet,FlatList,TouchableOpacity,TextInput,KeyboardAvoidingView,Platform,ScrollView}from'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import{colors,spacing}from'../theme';
@@ -26,8 +26,22 @@ useEffect(()=>{(async()=>{const stored=await loadTasks();setTasks(stored.length?
 useEffect(()=>{saveTasks(tasks);},[tasks]);
 
 const list=useMemo(()=>tasks.filter(t=>filter==='all'?true:t.categories.includes(filter)),[tasks,filter]);
-const toggle=(id:string)=>setTasks(prev=>prev.map(t=>t.id===id?{...t,done:!t.done}:t));
-const toggleSub=(taskId:string,subId:string)=>setTasks(prev=>prev.map(t=>{if(t.id!==taskId||!t.subtasks)return t;return{...t,subtasks:t.subtasks.map(s=>s.id===subId?{...s,done:!s.done}:s)}}));
+const toggle=useCallback((id:string)=>{
+  setTasks(prev=>prev.map(t=>t.id===id?{...t,done:!t.done,updatedAt:new Date().toISOString()}:t));
+},[]);
+const toggleSub=useCallback((taskId:string,subId:string)=>{
+  setTasks(prev=>prev.map(t=>{
+    if(t.id!==taskId||!t.subtasks) return t;
+    return {
+      ...t,
+      updatedAt:new Date().toISOString(),
+      subtasks:t.subtasks.map(s=>s.id===subId?{...s,done:!s.done}:s)
+    };
+  }));
+},[]);
+const renderItem=useCallback(({item}:{item:Task})=> (
+  <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub}/>
+),[toggle,toggleSub]);
 
 return(
   <SafeAreaView style={styles.safe} edges={['top','left','right','bottom']}>
@@ -41,7 +55,17 @@ return(
           </TouchableOpacity>
         ))}
       </View>
-      <FlatList data={list} keyExtractor={i=>i.id} renderItem={({item})=>(<TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub}/>)} contentContainerStyle={{paddingBottom:spacing(12)}}/>
+      <FlatList
+        data={list}
+        keyExtractor={i=>i.id}
+        renderItem={renderItem}
+        contentContainerStyle={{paddingBottom:spacing(12)}}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        windowSize={7}
+        removeClippedSubviews
+      />
       <TouchableOpacity style={styles.fab} onPress={()=>{
         // Открываем редактор с черновиком без категорий по умолчанию
         const draft:Task={
