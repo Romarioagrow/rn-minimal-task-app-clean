@@ -39,8 +39,11 @@ const toggleSub=useCallback((taskId:string,subId:string)=>{
     };
   }));
 },[]);
+const handleDelete=useCallback((id:string)=>{
+  setTasks(prev=>prev.filter(t=>t.id!==id));
+},[]);
 const renderItem=useCallback(({item}:{item:Task})=> (
-  <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub}/>
+  <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub} onDelete={handleDelete}/>
 ),[toggle,toggleSub]);
 
 return(

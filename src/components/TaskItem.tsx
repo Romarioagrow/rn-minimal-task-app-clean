@@ -1,20 +1,34 @@
 import React,{useState,useEffect}from'react';
-import{View,Text,StyleSheet,TouchableOpacity,LayoutAnimation}from'react-native';
+import{View,Text,StyleSheet,TouchableOpacity,LayoutAnimation,Animated,PanResponder}from'react-native';
 import{colors,radius,spacing,font}from'../theme';
 import CategoryPill from './CategoryPill';
 import type{Task,Subtask,CategoryKey}from'../types';
 
-interface Props{task:Task;onToggle:(id:string)=>void;onToggleSub:(taskId:string,subId:string)=>void;}
+interface Props{task:Task;onToggle:(id:string)=>void;onToggleSub:(taskId:string,subId:string)=>void;onDelete:(id:string)=>void;}
 
-export default function TaskItem({task,onToggle,onToggleSub}:Props){
+export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
   const[open,setOpen]=useState(Boolean(task.subtasks?.length));
   useEffect(()=>{if((task.subtasks?.length||0)>0&&!open){setOpen(true);}},[task.subtasks?.length]);
   const toggleOpen=()=>{LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);setOpen(v=>!v);} ;
   const repeatLabel=(r:Task['repeat'])=>r===null?'Нет':r==='daily'?'Ежедневно':r==='weekly'?'Еженедельно':'Ежемесячно';
   const progress=task.subtasks&&task.subtasks.length>0?task.subtasks.filter(s=>s.done).length/task.subtasks.length:0;
+  const translateX=React.useRef(new Animated.Value(0)).current;
+  const pan=React.useRef(PanResponder.create({
+    onMoveShouldSetPanResponder:(_,g)=>Math.abs(g.dx)>8&&Math.abs(g.dy)<10,
+    onPanResponderMove:(_,g)=>{ if(g.dx<0) translateX.setValue(g.dx); },
+    onPanResponderRelease:(_,g)=>{
+      if(g.dx<-100){
+        Animated.timing(translateX,{toValue:-600,duration:180,useNativeDriver:true}).start(()=>onDelete(task.id));
+      }else{
+        Animated.spring(translateX,{toValue:0,useNativeDriver:true}).start();
+      }
+    }
+  })).current;
 
   return (
-    <View style={styles.card}>
+    <View style={styles.swipeContainer}>
+      <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
+      <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
       <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
         <TouchableOpacity onPress={()=>onToggle(task.id)} onLongPress={toggleOpen}>
           <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
@@ -55,12 +69,16 @@ export default function TaskItem({task,onToggle,onToggleSub}:Props){
 
       <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
       <Text style={styles.footerText}>Создано {new Date(task.createdAt).toLocaleDateString()} {task.updatedAt?` · Обновлено ${new Date(task.updatedAt).toLocaleDateString()}`:''}</Text>
+      </Animated.View>
     </View>
   );
 }
 
 const styles=StyleSheet.create({
-  card:{backgroundColor:colors.card,borderRadius:radius.xl,padding:spacing(2),marginBottom:spacing(2),borderWidth:1,borderColor:colors.border},
+  swipeContainer:{marginBottom:spacing(2),position:'relative',borderRadius:radius.xl,overflow:'hidden'},
+  deleteBg:{...StyleSheet.absoluteFillObject,backgroundColor:'#7f1d1d',justifyContent:'center',alignItems:'flex-end',paddingRight:spacing(2)},
+  deleteText:{color:'#fff',fontWeight:'800'},
+  card:{backgroundColor:colors.card,borderRadius:radius.xl,padding:spacing(2),borderWidth:1,borderColor:colors.border},
   header:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:spacing(1)},
   row:{flexDirection:'row',alignItems:'center',gap:spacing(1.5)},
   checkbox:{width:24,height:24,borderRadius:12,borderWidth:2,borderColor:colors.border,backgroundColor:'transparent'},
@@ -69,7 +87,7 @@ const styles=StyleSheet.create({
   done:{color:colors.subtext,textDecorationLine:'line-through'},
   time:{color:colors.subtext,fontSize:14},
   subs:{marginTop:spacing(1.5),paddingLeft:spacing(3)},
-  subrow:{flexDirection:'row',alignItems:'center',gap:spacing(1),paddingVertical:8,paddingHorizontal:spacing(1),borderRadius:12,borderWidth:1,borderColor:colors.border},
+  subrow:{flexDirection:'row',alignItems:'center',gap:spacing(1),paddingVertical:8,paddingHorizontal:spacing(1),borderRadius:12},
   subDot:{width:18,height:18,borderRadius:9,borderWidth:2,borderColor:colors.border,backgroundColor:'transparent'},
   subDotOn:{backgroundColor:colors.accent,borderColor:colors.accent},
   subtext:{color:colors.text,fontSize:font.text},
