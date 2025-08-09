@@ -1,0 +1,1 @@
+import React from 'react';import{StatusBar}from'expo-status-bar';import TasksScreen from './src/screens/TasksScreen';export default function App(){return(<><StatusBar style='light'/><TasksScreen/></>);}
