@@ -338,8 +338,8 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
              </View>
              )}
 
-             <Text style={[editorStyles.sectionTitle, {marginTop: spacing(2)}]}>Заметки</Text>
-            <Input value={notes} onChangeText={setNotes} placeholder="Заметки" multiline style={{marginTop:spacing(1)}}/>
+                           <Text style={[editorStyles.sectionTitle, {marginTop: spacing(2)}]}>Заметки</Text>
+             <Input value={notes} onChangeText={setNotes} placeholder="Дополнительная информация, идеи, детали..." multiline style={{marginTop:spacing(1),height:80,borderRadius:10}}/>
 
             <View style={{flexDirection:'row',justifyContent:'space-between',marginTop:spacing(2)}}>
               <TouchableOpacity onPress={onDelete}><Text style={{color:'#ef4444',fontWeight:'700'}}>Удалить</Text></TouchableOpacity>
