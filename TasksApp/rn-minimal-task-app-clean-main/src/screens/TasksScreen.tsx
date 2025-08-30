@@ -144,6 +144,7 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
      const [subtasks,setSubtasks]=useState(task.subtasks||[]);
    const [repeatOpen,setRepeatOpen]=useState(false);
    const [settingsOpen,setSettingsOpen]=useState(false);
+   const [categoriesOpen,setCategoriesOpen]=useState(false);
 
   const CATEGORY_LABELS:Record<CategoryKey,string>={work:'Работа',home:'Дом',global:'Глобальное',habit:'Повтор',personal:'Личное',urgent:'Срочно'};
   const toggleCategory=(c:CategoryKey)=>setCategories(prev=>prev.includes(c)?prev.filter(x=>x!==c):[...prev,c]);
@@ -180,18 +181,30 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{paddingBottom:spacing(4)}}>
             <Input value={title} onChangeText={setTitle} placeholder="Название задачи" style={{marginBottom:spacing(2),height:44,borderRadius:10}}/>
 
-                         <Text style={editorStyles.sectionTitle}>Категории (можно несколько:)</Text>
-             <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
-               {(['home','work','global','personal','habit','urgent'] as CategoryKey[]).map(c=>{
-                 const selected=categories.includes(c);
-                 const color=(colors.categories as any)[c]||colors.accent;
-                 return (
-                   <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?color:colors.border,backgroundColor:selected?`${color}22`:'transparent'}]}>
-                     <Text style={[editorStyles.catChipText,{color:selected?color:colors.text}]}>{CATEGORY_LABELS[c]}</Text>
-                   </TouchableOpacity>
-                 );
-               })}
-             </View>
+                        <TouchableOpacity 
+              style={editorStyles.settingsToggle} 
+              onPress={() => setCategoriesOpen(!categoriesOpen)}
+            >
+              <Text style={editorStyles.settingsToggleText}>
+                {categoriesOpen ? '▼' : '▶'} Категории
+              </Text>
+            </TouchableOpacity>
+
+                         {categoriesOpen && (
+               <View>
+                 <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
+                  {(['home','work','global','personal','habit','urgent'] as CategoryKey[]).map(c=>{
+                    const selected=categories.includes(c);
+                    const color=(colors.categories as any)[c]||colors.accent;
+                    return (
+                      <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?color:colors.border,backgroundColor:selected?`${color}22`:'transparent'}]}>
+                        <Text style={[editorStyles.catChipText,{color:selected?color:colors.text}]}>{CATEGORY_LABELS[c]}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
 
              <TouchableOpacity 
                style={editorStyles.settingsToggle} 
