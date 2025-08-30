@@ -81,11 +81,11 @@ return(
 
       <Text style={styles.h1}>Задачи</Text>
       <Text style={styles.caption}>Всего: {list.length} • Активных: {list.filter(t=>!t.done).length}</Text>
-                                                                                                       <View style={styles.filtersContainer}>
+      <View style={styles.filtersContainer}>
         <ScrollView 
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ maxHeight: 96 }}
+          showsVerticalScrollIndicator={false}
+          style={{ maxHeight: 120 }}
+          nestedScrollEnabled={true}
         >
           <View style={styles.filters}>
             <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
@@ -162,8 +162,8 @@ container:{flex:1,paddingHorizontal:spacing(1.5),paddingTop:spacing(1)},
 h1:{color:'#ffffff',fontSize:24,fontWeight:'800'},
 caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontWeight:'400'},
 filtersContainer:{marginBottom:spacing(2)},
-filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',width:400},
-fbtn:{paddingHorizontal:spacing(1),paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e'},
+filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',justifyContent:'center',paddingHorizontal:spacing(1),paddingVertical:spacing(1)},
+fbtn:{paddingHorizontal:spacing(1),paddingVertical:6,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e',marginBottom:4},
 fbtnOn:{backgroundColor:'#1f2937'},
 ftext:{color:'#a3a3aa',fontSize:12,fontWeight:'500'},
 ftextOn:{color:'#ffffff',fontWeight:'700'},
