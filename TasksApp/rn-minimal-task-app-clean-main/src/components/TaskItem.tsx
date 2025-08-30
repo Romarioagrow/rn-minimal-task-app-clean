@@ -29,28 +29,28 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
     <View style={styles.swipeContainer}>
       <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
       <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
-      <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
-        <TouchableOpacity onPress={()=>onToggle(task.id)} onLongPress={toggleOpen}>
-          <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
-        </TouchableOpacity>
-        <Text style={[styles.titleLarge,task.done&&styles.done]}>{task.title||'(без названия)'}</Text>
-      </View>
+             <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
+         <TouchableOpacity onPress={()=>onToggle(task.id)} onLongPress={toggleOpen}>
+           <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
+         </TouchableOpacity>
+                                       <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginRight:spacing(0.5)}]}>{task.title||'(без названия)'}</Text>
+       </View>
 
       <View style={{flexDirection:'row',gap:8,flexWrap:'wrap',marginBottom:spacing(1)}}>
         {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c}/>))}
       </View>
 
-      <View style={{flexDirection:'row',gap:spacing(3),flexWrap:'wrap',marginBottom:spacing(1)}}>
-        {task.dueAt?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🗓️</Text><Text style={styles.metaText}>{new Date(task.dueAt).toLocaleDateString()} , {new Date(task.dueAt).toLocaleTimeString().slice(0,5)}</Text></View>):null}
-        {task.repeat?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔁</Text><Text style={styles.metaText}>Повтор {repeatLabel(task.repeat).toLowerCase()}</Text></View>):null}
-        {typeof task.reminderMinutesBefore==='number'?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔔</Text><Text style={styles.metaText}>За {task.reminderMinutesBefore} мин</Text></View>):null}
-        {task.priority?(<View style={styles.metaRow}><Text style={styles.metaIcon}>📌</Text><Text style={styles.metaText}>{task.priority==='high'?'Высокий':task.priority==='medium'?'Средний':'Низкий'} приоритет</Text></View>):null}
-      </View>
+             <View style={{flexDirection:'row',gap:spacing(1.5),flexWrap:'wrap',marginBottom:spacing(1)}}>
+         {task.dueAt?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🗓️</Text><Text style={styles.metaText}>{new Date(task.dueAt).toLocaleDateString()} , {new Date(task.dueAt).toLocaleTimeString().slice(0,5)}</Text></View>):null}
+         {task.repeat?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔁</Text><Text style={styles.metaText}>Повтор {repeatLabel(task.repeat).toLowerCase()}</Text></View>):null}
+         {typeof task.reminderMinutesBefore==='number'?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔔</Text><Text style={styles.metaText}>За {task.reminderMinutesBefore} мин</Text></View>):null}
+         {task.priority?(<View style={styles.metaRow}><Text style={styles.metaIcon}>📌</Text><Text style={styles.metaText}>{task.priority==='high'?'Высокий':task.priority==='medium'?'Средний':'Низкий'} приоритет</Text></View>):null}
+       </View>
 
-      {task.notes?(<View style={{marginVertical:spacing(1)}}>
-        <Text style={styles.sectionTitle}>Заметки</Text>
-        <Text style={styles.notes} numberOfLines={2}>{task.notes}</Text>
-      </View>):null}
+             {task.notes?(<View style={{marginVertical:spacing(1)}}>
+         <Text style={styles.sectionTitle}>Заметки</Text>
+         <Text style={styles.notes}>{task.notes}</Text>
+       </View>):null}
 
       {task.subtasks?.length?(<View style={{marginTop:spacing(1)}}>
         <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
