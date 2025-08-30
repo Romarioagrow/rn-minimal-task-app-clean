@@ -98,7 +98,11 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
                   return `Выполнено за ${durationDays} дн.`;
                 } else {
                   const durationMinutes = Math.floor(durationMs / (1000 * 60));
-                  return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+                  if (durationHours > 0) {
+                    return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+                  } else {
+                    return `Выполнено за ${durationMinutes}м`;
+                  }
                 }
              })()}
            </Text>
