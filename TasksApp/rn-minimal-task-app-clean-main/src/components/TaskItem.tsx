@@ -68,10 +68,21 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
         </View>
         <View style={{marginTop:spacing(1)}}>
           {task.subtasks.map((s:Subtask)=>(
-            <TouchableOpacity key={s.id} style={styles.subrow} onPress={()=>onToggleSub(task.id,s.id)}>
-              <View style={[styles.subDot,s.done&&styles.subDotOn]}/>
-              <Text style={[styles.subtext,s.done&&styles.subdone]}>{s.title}</Text>
-            </TouchableOpacity>
+                         <TouchableOpacity key={s.id} style={styles.subrow} onPress={()=>{
+               onToggleSub(task.id,s.id);
+               // Проверяем, все ли цели выполнены после изменения
+               const updatedSubtasks = task.subtasks.map(sub => 
+                 sub.id === s.id ? { ...sub, done: !sub.done } : sub
+               );
+               const allDone = updatedSubtasks.every(sub => sub.done);
+               // Если все цели выполнены и задача еще не выполнена, отмечаем задачу как выполненную
+               if (allDone && !task.done) {
+                 onToggle(task.id);
+               }
+             }}>
+               <View style={[styles.subDot,s.done&&styles.subDotOn]}/>
+               <Text style={[styles.subtext,s.done&&styles.subdone]}>{s.title}</Text>
+             </TouchableOpacity>
           ))}
         </View>
         <View style={styles.progressWrap}><View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} /></View>
