@@ -23,11 +23,12 @@ const[editingTaskId,setEditingTaskId]=useState<string|null>(null);
 const[draftTask,setDraftTask]=useState<Task|null>(null);
 const[filter,setFilter]=useState<'all'|CategoryKey>('all');
 const[customCategories,setCustomCategories]=useState<string[]>([]);
-
 useEffect(()=>{(async()=>{const stored=await loadTasks();setTasks(stored.length?stored:defaultData);})();},[]);
 useEffect(()=>{saveTasks(tasks);},[tasks]);
 useEffect(()=>{(async()=>{const stored=await loadCustomCategories();setCustomCategories(stored);})();},[]);
 useEffect(()=>{saveCustomCategories(customCategories);},[customCategories]);
+
+
 
 const list=useMemo(()=>tasks.filter(t=>filter==='all'?true:t.categories.includes(filter)),[tasks,filter]);
 
@@ -70,31 +71,34 @@ const renderItem=useCallback(({item}:{item:Task})=> (
   <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub} onDelete={handleDelete} customCategories={customCategories}/>
 ),[toggle,toggleSub,customCategories]);
 
+
+
+
+
 return(
   <SafeAreaView style={styles.safe} edges={['top','left','right','bottom']}>
     <View style={styles.container}>
 
       <Text style={styles.h1}>Задачи</Text>
       <Text style={styles.caption}>Всего: {list.length} • Активных: {list.filter(t=>!t.done).length}</Text>
-             <View style={styles.filtersContainer}>
-         <ScrollView 
-           horizontal
-           style={styles.filtersScroll}
-           showsHorizontalScrollIndicator={false}
-           nestedScrollEnabled={true}
-         >
-           <View style={styles.filters}>
-             <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
-               <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
-             </TouchableOpacity>
-             {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
-               <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
-                 <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{getCategoryLabels()[c as CategoryKey]||String(c)}</Text>
-               </TouchableOpacity>
-             ))}
-           </View>
-         </ScrollView>
-       </View>
+                                                                                                       <View style={styles.filtersContainer}>
+        <ScrollView 
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ maxHeight: 96 }}
+        >
+          <View style={styles.filters}>
+            <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
+              <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
+            </TouchableOpacity>
+            {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
+              <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
+                <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{getCategoryLabels()[c as CategoryKey]||String(c)}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
       <FlatList
         data={list}
         keyExtractor={i=>i.id}
@@ -158,8 +162,7 @@ container:{flex:1,paddingHorizontal:spacing(1.5),paddingTop:spacing(1)},
 h1:{color:'#ffffff',fontSize:24,fontWeight:'800'},
 caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontWeight:'400'},
 filtersContainer:{marginBottom:spacing(2)},
-filtersScroll:{maxHeight:96}, // Ограничиваем высоту тремя строчками
-filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',width:600}, // Ширина больше экрана для переноса на 2-3 строки
+filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',width:400},
 fbtn:{paddingHorizontal:spacing(1),paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e'},
 fbtnOn:{backgroundColor:'#1f2937'},
 ftext:{color:'#a3a3aa',fontSize:12,fontWeight:'500'},
