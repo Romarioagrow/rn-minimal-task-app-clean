@@ -28,67 +28,66 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
   return (
     <View style={styles.swipeContainer}>
       <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
-      <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
-        
-        {/* Заголовок задачи */}
-        <View style={styles.headerBlock}>
-          <View style={styles.titleRow}>
-            <TouchableOpacity onPress={()=>{
-              onToggle(task.id);
-              if (!task.done && task.subtasks?.length) {
-                task.subtasks.forEach(subtask => {
-                  if (!subtask.done) {
-                    onToggleSub(task.id, subtask.id);
-                  }
-                });
-              }
-            }} onLongPress={toggleOpen}>
-              <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
-            </TouchableOpacity>
-            <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginLeft:spacing(1.5)}]}>
-              {task.title||'(без названия)'}
-            </Text>
-          </View>
-        </View>
+             <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
+         
+         {/* Блок категорий */}
+         {task.categories.length > 0 && (
+           <View style={styles.categoriesTopBlock}>
+             <View style={styles.categoriesContainer}>
+               {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c} customCategories={customCategories}/>))}
+             </View>
+           </View>
+         )}
 
-        {/* Блок целей */}
-        {task.subtasks?.length > 0 && (
-          <View style={styles.contentBlock}>
-            <Text style={styles.blockTitle}>Цели</Text>
-            <View style={styles.goalsContainer}>
-              {task.subtasks.map((s:Subtask)=>(
-                <TouchableOpacity key={s.id} style={styles.goalItem} onPress={()=>{
-                  onToggleSub(task.id,s.id);
-                  const updatedSubtasks = task.subtasks.map(sub => 
-                    sub.id === s.id ? { ...sub, done: !sub.done } : sub
-                  );
-                  const allDone = updatedSubtasks.every(sub => sub.done);
-                  if (allDone && !task.done) {
-                    onToggle(task.id);
-                  }
-                }}>
-                  <View style={[styles.goalDot,s.done&&styles.goalDotOn]}/>
-                  <Text style={[styles.goalText,s.done&&styles.goalDone]}>{s.title}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.progressContainer}>
-              <View style={styles.progressWrap}>
-                <View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} />
-              </View>
-            </View>
-          </View>
-        )}
+         {/* Заголовок задачи */}
+         <View style={styles.headerBlock}>
+           <View style={styles.titleRow}>
+             <TouchableOpacity onPress={()=>{
+               onToggle(task.id);
+               if (!task.done && task.subtasks?.length) {
+                 task.subtasks.forEach(subtask => {
+                   if (!subtask.done) {
+                     onToggleSub(task.id, subtask.id);
+                   }
+                 });
+               }
+             }} onLongPress={toggleOpen}>
+               <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
+             </TouchableOpacity>
+             <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginLeft:spacing(1.5)}]}>
+               {task.title||'(без названия)'}
+             </Text>
+           </View>
+         </View>
 
-        {/* Блок категорий */}
-        {task.categories.length > 0 && (
-          <View style={styles.contentBlock}>
-            <Text style={styles.blockTitle}>Категории</Text>
-            <View style={styles.categoriesContainer}>
-              {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c} customCategories={customCategories}/>))}
-            </View>
-          </View>
-        )}
+         {/* Блок целей */}
+         {task.subtasks?.length > 0 && (
+           <View style={styles.contentBlock}>
+             <Text style={styles.blockTitle}>Цели</Text>
+             <View style={styles.goalsContainer}>
+               {task.subtasks.map((s:Subtask)=>(
+                 <TouchableOpacity key={s.id} style={styles.goalItem} onPress={()=>{
+                   onToggleSub(task.id,s.id);
+                   const updatedSubtasks = task.subtasks.map(sub => 
+                     sub.id === s.id ? { ...sub, done: !sub.done } : sub
+                   );
+                   const allDone = updatedSubtasks.every(sub => sub.done);
+                   if (allDone && !task.done) {
+                     onToggle(task.id);
+                   }
+                 }}>
+                   <View style={[styles.goalDot,s.done&&styles.goalDotOn]}/>
+                   <Text style={[styles.goalText,s.done&&styles.goalDone]}>{s.title}</Text>
+                 </TouchableOpacity>
+               ))}
+             </View>
+             <View style={styles.progressContainer}>
+               <View style={styles.progressWrap}>
+                 <View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} />
+               </View>
+             </View>
+           </View>
+         )}
 
         {/* Блок планирования */}
         {(task.dueAt || task.repeat || typeof task.reminderMinutesBefore === 'number' || task.priority) && (
@@ -255,6 +254,9 @@ const styles=StyleSheet.create({
   },
   
   // Блок категорий
+  categoriesTopBlock:{
+    marginBottom:spacing(1.5)
+  },
   categoriesContainer:{
     flexDirection:'row',
     gap:8,
