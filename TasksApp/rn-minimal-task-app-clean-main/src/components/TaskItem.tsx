@@ -39,26 +39,30 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
            </View>
          )}
 
-         {/* Заголовок задачи */}
-         <View style={styles.headerBlock}>
-           <View style={styles.titleRow}>
-             <TouchableOpacity onPress={()=>{
-               onToggle(task.id);
-               if (!task.done && task.subtasks?.length) {
-                 task.subtasks.forEach(subtask => {
-                   if (!subtask.done) {
-                     onToggleSub(task.id, subtask.id);
-                   }
-                 });
-               }
-             }} onLongPress={toggleOpen}>
-               <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
-             </TouchableOpacity>
-             <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginLeft:spacing(1.5)}]}>
-               {task.title||'(без названия)'}
-             </Text>
-           </View>
-         </View>
+                   {/* Заголовок задачи */}
+          <View style={[
+            styles.headerBlock,
+            // Если только название и больше ничего нет, добавляем равные отступы
+            (!task.subtasks?.length && !task.categories.length && !task.dueAt && !task.repeat && typeof task.reminderMinutesBefore !== 'number' && !task.priority && !task.notes) && styles.headerBlockAlone
+          ]}>
+            <View style={styles.titleRow}>
+              <TouchableOpacity onPress={()=>{
+                onToggle(task.id);
+                if (!task.done && task.subtasks?.length) {
+                  task.subtasks.forEach(subtask => {
+                    if (!subtask.done) {
+                      onToggleSub(task.id, subtask.id);
+                    }
+                  });
+                }
+              }} onLongPress={toggleOpen}>
+                <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
+              </TouchableOpacity>
+              <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginLeft:spacing(1.5)}]}>
+                {task.title||'(без названия)'}
+              </Text>
+            </View>
+          </View>
 
          {/* Блок целей */}
          {task.subtasks?.length > 0 && (
@@ -214,7 +218,11 @@ const styles=StyleSheet.create({
   
   // Блок заголовка
   headerBlock:{
-    marginBottom:spacing(2)
+    marginBottom:spacing(1.75)
+  },
+  headerBlockAlone:{
+    marginTop:spacing(1.75),
+    marginBottom:spacing(1.75)
   },
   titleRow:{
     flexDirection:'row',
@@ -244,7 +252,7 @@ const styles=StyleSheet.create({
   
   // Общие стили для контентных блоков
   contentBlock:{
-    marginBottom:spacing(2)
+    marginBottom:spacing(1.75)
   },
   blockTitle:{
     color:colors.text,
@@ -255,7 +263,7 @@ const styles=StyleSheet.create({
   
   // Блок категорий
   categoriesTopBlock:{
-    marginBottom:spacing(1.5)
+    marginBottom:spacing(1.25)
   },
   categoriesContainer:{
     flexDirection:'row',
