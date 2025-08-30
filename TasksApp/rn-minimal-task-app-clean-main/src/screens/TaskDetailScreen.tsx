@@ -21,7 +21,6 @@ export default function TaskDetailScreen({
   onDelete, 
   onAddCustomCategory 
 }: Props) {
-  console.log('TaskDetailScreen rendered with task:', task.title);
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes || '');
   const [categories, setCategories] = useState<CategoryKey[]>(task.categories);

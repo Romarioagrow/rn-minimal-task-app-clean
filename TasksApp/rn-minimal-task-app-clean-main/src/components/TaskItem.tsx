@@ -30,7 +30,6 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
       <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
                            <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
                 <TouchableOpacity onPress={() => {
-                  console.log('Card pressed!');
                   if (onPress) onPress();
                 }} style={{flex:1}} activeOpacity={0.7} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
                    <View style={{flex:1}}>

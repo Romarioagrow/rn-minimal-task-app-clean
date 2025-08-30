@@ -88,10 +88,8 @@ const renderItem=useCallback(({item}:{item:Task})=> (
     onDelete={handleDelete} 
     customCategories={customCategories}
     onPress={() => {
-      console.log('Opening detail for task:', item.title);
       setDetailTask(item);
       setDetailOpen(true);
-      console.log('detailOpen set to true, detailTask:', item.title);
     }}
   />
 ),[toggle,toggleSub,customCategories]);
