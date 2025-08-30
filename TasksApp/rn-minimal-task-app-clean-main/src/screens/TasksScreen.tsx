@@ -3,6 +3,7 @@ import{View,Text,StyleSheet,FlatList,TouchableOpacity,TextInput,KeyboardAvoiding
 import { SafeAreaView } from 'react-native-safe-area-context';
 import{colors,spacing}from'../theme';
 import TaskItem from'../components/TaskItem';
+import TaskDetailScreen from'./TaskDetailScreen';
 
 import type{Task,CategoryKey}from'../types';
 import{loadTasks,saveTasks,loadCustomCategories,saveCustomCategories}from'../storage';
@@ -23,6 +24,8 @@ const[editingTaskId,setEditingTaskId]=useState<string|null>(null);
 const[draftTask,setDraftTask]=useState<Task|null>(null);
 const[filter,setFilter]=useState<'all'|CategoryKey>('all');
 const[customCategories,setCustomCategories]=useState<string[]>([]);
+const[detailOpen,setDetailOpen]=useState(false);
+const[detailTask,setDetailTask]=useState<Task|null>(null);
 useEffect(()=>{(async()=>{const stored=await loadTasks();setTasks(stored.length?stored:defaultData);})();},[]);
 useEffect(()=>{saveTasks(tasks);},[tasks]);
 useEffect(()=>{(async()=>{const stored=await loadCustomCategories();setCustomCategories(stored);})();},[]);
@@ -78,7 +81,17 @@ const handleDelete=useCallback((id:string)=>{
   setTasks(prev=>prev.filter(t=>t.id!==id));
 },[]);
 const renderItem=useCallback(({item}:{item:Task})=> (
-  <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub} onDelete={handleDelete} customCategories={customCategories}/>
+  <TaskItem 
+    task={item} 
+    onToggle={toggle} 
+    onToggleSub={toggleSub} 
+    onDelete={handleDelete} 
+    customCategories={customCategories}
+    onPress={() => {
+      setDetailTask(item);
+      setDetailOpen(true);
+    }}
+  />
 ),[toggle,toggleSub,customCategories]);
 
 
@@ -161,10 +174,38 @@ return(
             }
           }}
         />
-      ):null}
-    </View>
-  </SafeAreaView>
-);
+             ):null}
+       
+       {/* Детальный просмотр задачи */}
+       {detailOpen && detailTask && (
+         <TaskDetailScreen
+           task={detailTask}
+           customCategories={customCategories}
+           onClose={() => {
+             setDetailOpen(false);
+             setDetailTask(null);
+           }}
+           onSave={(updated) => {
+             setTasks(prev => prev.map(t => t.id === updated.id ? updated : t));
+             setDetailTask(updated);
+           }}
+           onDelete={() => {
+             if (detailTask) {
+               setTasks(prev => prev.filter(t => t.id !== detailTask.id));
+             }
+             setDetailOpen(false);
+             setDetailTask(null);
+           }}
+           onAddCustomCategory={(category) => {
+             if (!customCategories.includes(category)) {
+               setCustomCategories(prev => [...prev, category]);
+             }
+           }}
+         />
+       )}
+     </View>
+   </SafeAreaView>
+ );
 }
 
 const styles=StyleSheet.create({
@@ -272,12 +313,12 @@ function TaskEditor({task,customCategories,onClose,onSave,onDelete,onAddCustomCa
                          style={[editorStyles.input,{paddingVertical:10,color:colors.text}]}
                        />
                     </View>
-                    <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
+                                         <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:16,bottom:16,left:16,right:16}} style={{padding:8}}><Text style={{color:'#ef4444',fontSize:24,fontWeight:'bold'}}>×</Text></TouchableOpacity>
                   </View>
                 ))}
-                               <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginLeft:spacing(1)}}>
-                  <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
-                </TouchableOpacity>
+                                                               <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginBottom:spacing(1), paddingVertical:spacing(0.75), paddingHorizontal:spacing(1)}}>
+                   <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
+                 </TouchableOpacity>
               </View>
               )}
 
