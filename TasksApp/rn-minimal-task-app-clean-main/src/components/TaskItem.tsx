@@ -51,6 +51,35 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
           </View>
         </View>
 
+        {/* Блок целей */}
+        {task.subtasks?.length > 0 && (
+          <View style={styles.contentBlock}>
+            <Text style={styles.blockTitle}>Цели</Text>
+            <View style={styles.goalsContainer}>
+              {task.subtasks.map((s:Subtask)=>(
+                <TouchableOpacity key={s.id} style={styles.goalItem} onPress={()=>{
+                  onToggleSub(task.id,s.id);
+                  const updatedSubtasks = task.subtasks.map(sub => 
+                    sub.id === s.id ? { ...sub, done: !sub.done } : sub
+                  );
+                  const allDone = updatedSubtasks.every(sub => sub.done);
+                  if (allDone && !task.done) {
+                    onToggle(task.id);
+                  }
+                }}>
+                  <View style={[styles.goalDot,s.done&&styles.goalDotOn]}/>
+                  <Text style={[styles.goalText,s.done&&styles.goalDone]}>{s.title}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.progressContainer}>
+              <View style={styles.progressWrap}>
+                <View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} />
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* Блок категорий */}
         {task.categories.length > 0 && (
           <View style={styles.contentBlock}>
@@ -103,35 +132,6 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
           <View style={styles.contentBlock}>
             <Text style={styles.blockTitle}>Заметки</Text>
             <Text style={styles.notesText}>{task.notes}</Text>
-          </View>
-        )}
-
-        {/* Блок целей */}
-        {task.subtasks?.length > 0 && (
-          <View style={styles.contentBlock}>
-            <Text style={styles.blockTitle}>Цели</Text>
-            <View style={styles.goalsContainer}>
-              {task.subtasks.map((s:Subtask)=>(
-                <TouchableOpacity key={s.id} style={styles.goalItem} onPress={()=>{
-                  onToggleSub(task.id,s.id);
-                  const updatedSubtasks = task.subtasks.map(sub => 
-                    sub.id === s.id ? { ...sub, done: !sub.done } : sub
-                  );
-                  const allDone = updatedSubtasks.every(sub => sub.done);
-                  if (allDone && !task.done) {
-                    onToggle(task.id);
-                  }
-                }}>
-                  <View style={[styles.goalDot,s.done&&styles.goalDotOn]}/>
-                  <Text style={[styles.goalText,s.done&&styles.goalDone]}>{s.title}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.progressContainer}>
-              <View style={styles.progressWrap}>
-                <View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} />
-              </View>
-            </View>
           </View>
         )}
 
@@ -290,7 +290,7 @@ const styles=StyleSheet.create({
   
   // Блок целей
   goalsContainer:{
-    gap:spacing(0.5),
+    gap:spacing(0.25),
     marginBottom:spacing(1)
   },
   goalItem:{
