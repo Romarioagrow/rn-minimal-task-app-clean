@@ -180,163 +180,163 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
       <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':undefined}>
         <View style={editorStyles.sheet}>
                      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{paddingBottom:spacing(4)}}>
-             <Text style={editorStyles.sectionTitle}>Название</Text>
-                           <Input value={title} onChangeText={setTitle} placeholder="Что нужно сделать? Опишите вашу задачу..." multiline style={{marginBottom:spacing(2),height:80,borderRadius:10}}/>
+                          <Text style={editorStyles.sectionTitle}>Новая задача</Text>
+                            <Input value={title} onChangeText={setTitle} placeholder="Что нужно сделать? Опишите вашу задачу..." multiline style={{marginBottom:spacing(2),height:80,borderRadius:10}}/>
 
-                        <TouchableOpacity 
-              style={editorStyles.settingsToggle} 
-              onPress={() => setCategoriesOpen(!categoriesOpen)}
-            >
-              <Text style={editorStyles.settingsToggleText}>
-                {categoriesOpen ? '▼' : '▶'} Категории
-              </Text>
-            </TouchableOpacity>
-
-                         {categoriesOpen && (
-               <View>
-                 <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
-                  {(['home','work','global','personal','habit','urgent'] as CategoryKey[]).map(c=>{
-                    const selected=categories.includes(c);
-                    const color=(colors.categories as any)[c]||colors.accent;
-                    return (
-                      <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?color:colors.border,backgroundColor:selected?`${color}22`:'transparent'}]}>
-                        <Text style={[editorStyles.catChipText,{color:selected?color:colors.text}]}>{CATEGORY_LABELS[c]}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-            )}
-
-             <TouchableOpacity 
-               style={editorStyles.settingsToggle} 
-               onPress={() => setSettingsOpen(!settingsOpen)}
-             >
-               <Text style={editorStyles.settingsToggleText}>
-                 {settingsOpen ? '▼' : '▶'} Настройки
-               </Text>
-             </TouchableOpacity>
-
-             {settingsOpen && (
-             <View style={editorStyles.settingsCard}>
-              {/* Дата и время */}
-              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setDueOpen(v=>!v)}>
-                <Text style={editorStyles.settingsLabel}>Дата и время:</Text>
-                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
-                  <Text style={editorStyles.settingsValue}>{formatDateTime(dueDate,dueTime)}</Text>
-                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
-                </View>
+              <TouchableOpacity 
+                style={editorStyles.settingsToggle} 
+                onPress={() => setGoalsOpen(!goalsOpen)}
+              >
+                <Text style={editorStyles.settingsToggleText}>
+                  {goalsOpen ? '▼' : '▶'} Цели
+                </Text>
               </TouchableOpacity>
-              {dueOpen?(
-                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),gap:spacing(1)}}>
-                  <Input value={dueDate} onChangeText={setDueDate} placeholder="YYYY-MM-DD"/>
-                  <Input value={dueTime} onChangeText={setDueTime} placeholder="HH:mm"/>
-                  <View style={{flexDirection:'row',gap:spacing(2)}}>
-                    <TouchableOpacity onPress={()=>{ const d=new Date(); d.setMinutes(d.getMinutes()+60); setDueDate(d.toISOString().slice(0,10)); setDueTime(d.toTimeString().slice(0,5)); }}>
-                      <Text style={{color:colors.accent,fontWeight:'700'}}>+1 час</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{ setDueDate(''); setDueTime(''); }}>
-                      <Text style={{color:colors.subtext}}>Очистить</Text>
-                    </TouchableOpacity>
+
+              {goalsOpen && (
+              <View style={{gap:8,marginTop:spacing(1)}}>
+                {subtasks.map(s=>(
+                  <View key={s.id} style={{flexDirection:'row',alignItems:'center',gap:10}}>
+                    <View style={{width:20,height:20,borderRadius:10,borderWidth:2,borderColor:colors.border}}/>
+                    <View style={{flex:1}}>
+                                            <TextInput
+                         value={s.title}
+                         onChangeText={(txt)=>updateSub(s.id,txt)}
+                         placeholder="Текст цели"
+                         placeholderTextColor={colors.subtext}
+                         style={[editorStyles.input,{paddingVertical:10,color:colors.text}]}
+                       />
+                    </View>
+                    <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
                   </View>
-                </View>
-              ):null}
-              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>{setRepeatOpen(v=>!v);}} onLongPress={cycleRepeat}>
-                <Text style={editorStyles.settingsLabel}>Повторение:</Text>
-                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
-                  <Text style={editorStyles.settingsValue}>{repeatLabel(repeat??null)}</Text>
-                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
-                </View>
-              </TouchableOpacity>
-              {repeatOpen?(
-                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1)}}>
-                  {([null,'daily','weekly','monthly'] as (Task['repeat'])[]).map(r=>{
-                    const on=repeat===r;
-                    return (
-                      <TouchableOpacity key={String(r)} onPress={()=>setRepeat(r)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
-                        <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{repeatLabel(r)}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              ):null}
+                ))}
+                               <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginLeft:spacing(1)}}>
+                  <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
+                </TouchableOpacity>
+              </View>
+              )}
 
-              {/* Напоминание */}
-              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setRemindOpen(v=>!v)}>
-                <Text style={editorStyles.settingsLabel}>Напоминание:</Text>
-                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
-                  <Text style={editorStyles.settingsValue}>{typeof reminder==='number'?`За ${reminder} мин`:'Нет'}</Text>
-                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
-                </View>
-              </TouchableOpacity>
-              {remindOpen?(
-                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1),flexWrap:'wrap'}}>
-                  {[null,5,10,30,60].map((m)=>{
-                    const on=reminder===m as any;
-                    return (
-                      <TouchableOpacity key={String(m)} onPress={()=>setReminder(m as any)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
-                        <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{m===null?'Нет':`За ${m} мин`}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              ):null}
-
-              {/* Приоритет */}
-              <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setPriorityOpen(v=>!v)}>
-                <Text style={editorStyles.settingsLabel}>Приоритет:</Text>
-                <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
-                  <Text style={editorStyles.settingsValue}>{priority===null?'Нет':priority==='high'?'Высокий':priority==='medium'?'Средний':'Низкий'}</Text>
-                  <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
-                </View>
-              </TouchableOpacity>
-              {priorityOpen?(
-                <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1)}}>
-                  {([null,'low','medium','high'] as (Task['priority'])[]).map(p=>{
-                    const on=priority===p;
-                    const label=p===null?'Нет':p==='high'?'Высокий':p==='medium'?'Средний':'Низкий';
-                    return (
-                      <TouchableOpacity key={String(p)} onPress={()=>setPriority(p)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
-                        <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{label}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                                 </View>
-               ):null}
-             </View>
-                          )}
-
-             <TouchableOpacity 
+                         <TouchableOpacity 
                style={editorStyles.settingsToggle} 
-               onPress={() => setGoalsOpen(!goalsOpen)}
+               onPress={() => setCategoriesOpen(!categoriesOpen)}
              >
                <Text style={editorStyles.settingsToggleText}>
-                 {goalsOpen ? '▼' : '▶'} Цели
+                 {categoriesOpen ? '▼' : '▶'} Категории
                </Text>
              </TouchableOpacity>
 
-             {goalsOpen && (
-             <View style={{gap:8,marginTop:spacing(1)}}>
-               {subtasks.map(s=>(
-                 <View key={s.id} style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                   <View style={{width:20,height:20,borderRadius:10,borderWidth:2,borderColor:colors.border}}/>
-                   <View style={{flex:1}}>
-                                           <TextInput
-                        value={s.title}
-                        onChangeText={(txt)=>updateSub(s.id,txt)}
-                        placeholder="Текст цели"
-                        placeholderTextColor={colors.subtext}
-                        style={[editorStyles.input,{paddingVertical:10,color:colors.text}]}
-                      />
-                   </View>
-                   <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
+                          {categoriesOpen && (
+                <View>
+                  <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
+                   {(['home','work','global','personal','habit','urgent'] as CategoryKey[]).map(c=>{
+                     const selected=categories.includes(c);
+                     const color=(colors.categories as any)[c]||colors.accent;
+                     return (
+                       <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?color:colors.border,backgroundColor:selected?`${color}22`:'transparent'}]}>
+                         <Text style={[editorStyles.catChipText,{color:selected?color:colors.text}]}>{CATEGORY_LABELS[c]}</Text>
+                       </TouchableOpacity>
+                     );
+                   })}
                  </View>
-               ))}
-                              <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginLeft:spacing(1)}}>
-                 <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
-               </TouchableOpacity>
-             </View>
+               </View>
              )}
+
+                            <TouchableOpacity 
+                 style={editorStyles.settingsToggle} 
+                 onPress={() => setSettingsOpen(!settingsOpen)}
+               >
+                 <Text style={editorStyles.settingsToggleText}>
+                   {settingsOpen ? '▼' : '▶'} Время и приоритет
+                 </Text>
+               </TouchableOpacity>
+
+              {settingsOpen && (
+              <View style={editorStyles.settingsCard}>
+               {/* Дата и время */}
+               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setDueOpen(v=>!v)}>
+                 <Text style={editorStyles.settingsLabel}>Дата и время:</Text>
+                 <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                   <Text style={editorStyles.settingsValue}>{formatDateTime(dueDate,dueTime)}</Text>
+                   <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                 </View>
+               </TouchableOpacity>
+               {dueOpen?(
+                 <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),gap:spacing(1)}}>
+                   <Input value={dueDate} onChangeText={setDueDate} placeholder="YYYY-MM-DD"/>
+                   <Input value={dueTime} onChangeText={setDueTime} placeholder="HH:mm"/>
+                   <View style={{flexDirection:'row',gap:spacing(2)}}>
+                     <TouchableOpacity onPress={()=>{ const d=new Date(); d.setMinutes(d.getMinutes()+60); setDueDate(d.toISOString().slice(0,10)); setDueTime(d.toTimeString().slice(0,5)); }}>
+                       <Text style={{color:colors.accent,fontWeight:'700'}}>+1 час</Text>
+                     </TouchableOpacity>
+                     <TouchableOpacity onPress={()=>{ setDueDate(''); setDueTime(''); }}>
+                       <Text style={{color:colors.subtext}}>Очистить</Text>
+                     </TouchableOpacity>
+                   </View>
+                 </View>
+               ):null}
+               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>{setRepeatOpen(v=>!v);}} onLongPress={cycleRepeat}>
+                 <Text style={editorStyles.settingsLabel}>Повторение:</Text>
+                 <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                   <Text style={editorStyles.settingsValue}>{repeatLabel(repeat??null)}</Text>
+                   <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                 </View>
+               </TouchableOpacity>
+               {repeatOpen?(
+                 <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1)}}>
+                   {([null,'daily','weekly','monthly'] as (Task['repeat'])[]).map(r=>{
+                     const on=repeat===r;
+                     return (
+                       <TouchableOpacity key={String(r)} onPress={()=>setRepeat(r)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
+                         <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{repeatLabel(r)}</Text>
+                       </TouchableOpacity>
+                     );
+                   })}
+                 </View>
+               ):null}
+
+               {/* Напоминание */}
+               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setRemindOpen(v=>!v)}>
+                 <Text style={editorStyles.settingsLabel}>Напоминание:</Text>
+                 <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                   <Text style={editorStyles.settingsValue}>{typeof reminder==='number'?`За ${reminder} мин`:'Нет'}</Text>
+                   <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                 </View>
+               </TouchableOpacity>
+               {remindOpen?(
+                 <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1),flexWrap:'wrap'}}>
+                   {[null,5,10,30,60].map((m)=>{
+                     const on=reminder===m as any;
+                     return (
+                       <TouchableOpacity key={String(m)} onPress={()=>setReminder(m as any)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
+                         <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{m===null?'Нет':`За ${m} мин`}</Text>
+                       </TouchableOpacity>
+                     );
+                   })}
+                 </View>
+               ):null}
+
+               {/* Приоритет */}
+               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setPriorityOpen(v=>!v)}>
+                 <Text style={editorStyles.settingsLabel}>Приоритет:</Text>
+                 <View style={{flexDirection:'row',alignItems:'center',gap:8}}>
+                   <Text style={editorStyles.settingsValue}>{priority===null?'Нет':priority==='high'?'Высокий':priority==='medium'?'Средний':'Низкий'}</Text>
+                   <Text style={{color:colors.subtext,fontSize:20}}>›</Text>
+                 </View>
+               </TouchableOpacity>
+               {priorityOpen?(
+                 <View style={{paddingHorizontal:spacing(2),paddingBottom:spacing(2),flexDirection:'row',gap:spacing(1)}}>
+                   {([null,'low','medium','high'] as (Task['priority'])[]).map(p=>{
+                     const on=priority===p;
+                     const label=p===null?'Нет':p==='high'?'Высокий':p==='medium'?'Средний':'Низкий';
+                     return (
+                       <TouchableOpacity key={String(p)} onPress={()=>setPriority(p)} style={[editorStyles.chip,on&&editorStyles.chipOn]}>
+                         <Text style={[editorStyles.chipText,on&&editorStyles.chipTextOn]}>{label}</Text>
+                       </TouchableOpacity>
+                     );
+                   })}
+                                  </View>
+                ):null}
+              </View>
+                           )}
 
                            <Text style={[editorStyles.sectionTitle, {marginTop: spacing(2)}]}>Заметки</Text>
              <Input value={notes} onChangeText={setNotes} placeholder="Дополнительная информация, идеи, детали..." multiline style={{marginTop:spacing(1),height:80,borderRadius:10}}/>
