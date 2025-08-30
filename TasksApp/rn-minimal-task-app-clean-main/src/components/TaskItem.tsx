@@ -30,7 +30,17 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
       <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
       <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
              <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
-         <TouchableOpacity onPress={()=>onToggle(task.id)} onLongPress={toggleOpen}>
+                   <TouchableOpacity onPress={()=>{
+            onToggle(task.id);
+            // Если задача отмечается как выполненная, то все цели тоже отмечаются как выполненные
+            if (!task.done && task.subtasks?.length) {
+              task.subtasks.forEach(subtask => {
+                if (!subtask.done) {
+                  onToggleSub(task.id, subtask.id);
+                }
+              });
+            }
+          }} onLongPress={toggleOpen}>
            <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
          </TouchableOpacity>
                                        <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginRight:spacing(0.5)}]}>{task.title||'(без названия)'}</Text>
