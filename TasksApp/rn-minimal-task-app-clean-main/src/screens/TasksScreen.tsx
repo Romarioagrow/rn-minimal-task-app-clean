@@ -141,8 +141,9 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
   const [dueTime,setDueTime]=useState<string>(task.dueAt?new Date(task.dueAt).toTimeString().slice(0,5):'');
   const [reminder,setReminder]=useState<number|undefined>(task.reminderMinutesBefore);
   const [priority,setPriority]=useState<Task['priority']>(task.priority??null);
-  const [subtasks,setSubtasks]=useState(task.subtasks||[]);
-  const [repeatOpen,setRepeatOpen]=useState(false);
+     const [subtasks,setSubtasks]=useState(task.subtasks||[]);
+   const [repeatOpen,setRepeatOpen]=useState(false);
+   const [settingsOpen,setSettingsOpen]=useState(false);
 
   const CATEGORY_LABELS:Record<CategoryKey,string>={work:'Работа',home:'Дом',global:'Глобальное',habit:'Повтор',personal:'Личное',urgent:'Срочно'};
   const toggleCategory=(c:CategoryKey)=>setCategories(prev=>prev.includes(c)?prev.filter(x=>x!==c):[...prev,c]);
@@ -179,20 +180,30 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{paddingBottom:spacing(4)}}>
             <Input value={title} onChangeText={setTitle} placeholder="Название задачи" style={{marginBottom:spacing(2),height:44,borderRadius:10}}/>
 
-            <Text style={editorStyles.sectionTitle}>Категории (можно несколько:)</Text>
-            <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
-              {(['home','work','global','personal','habit','urgent'] as CategoryKey[]).map(c=>{
-                const selected=categories.includes(c);
-                const color=(colors.categories as any)[c]||colors.accent;
-                return (
-                  <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?color:colors.border,backgroundColor:selected?`${color}22`:'transparent'}]}>
-                    <Text style={[editorStyles.catChipText,{color:selected?color:colors.text}]}>{CATEGORY_LABELS[c]}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                         <Text style={editorStyles.sectionTitle}>Категории (можно несколько:)</Text>
+             <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
+               {(['home','work','global','personal','habit','urgent'] as CategoryKey[]).map(c=>{
+                 const selected=categories.includes(c);
+                 const color=(colors.categories as any)[c]||colors.accent;
+                 return (
+                   <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?color:colors.border,backgroundColor:selected?`${color}22`:'transparent'}]}>
+                     <Text style={[editorStyles.catChipText,{color:selected?color:colors.text}]}>{CATEGORY_LABELS[c]}</Text>
+                   </TouchableOpacity>
+                 );
+               })}
+             </View>
 
-            <View style={editorStyles.settingsCard}>
+             <TouchableOpacity 
+               style={editorStyles.settingsToggle} 
+               onPress={() => setSettingsOpen(!settingsOpen)}
+             >
+               <Text style={editorStyles.settingsToggleText}>
+                 {settingsOpen ? '▼' : '▶'} Настройки
+               </Text>
+             </TouchableOpacity>
+
+             {settingsOpen && (
+             <View style={editorStyles.settingsCard}>
               {/* Дата и время */}
               <TouchableOpacity style={editorStyles.settingsRow} onPress={()=>setDueOpen(v=>!v)}>
                 <Text style={editorStyles.settingsLabel}>Дата и время:</Text>
@@ -275,9 +286,10 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                       </TouchableOpacity>
                     );
                   })}
-                </View>
-              ):null}
-            </View>
+                                 </View>
+               ):null}
+             </View>
+             )}
 
             <Text style={editorStyles.sectionTitle}>Подзадачи:</Text>
             <View style={{gap:8,marginTop:spacing(1)}}>
@@ -342,10 +354,12 @@ function Input({value,onChangeText,placeholder,style,multiline}:{value:string;on
   );
 }
 
-const editorStyles=StyleSheet.create({
-  backdrop:{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'#000000aa',justifyContent:'flex-end'},
-  sheet:{backgroundColor:colors.card,borderTopLeftRadius:16,borderTopRightRadius:16,padding:spacing(1.5),gap:spacing(1)},
-  sectionTitle:{color:colors.text,fontSize:16,fontWeight:'800',marginBottom:spacing(1)},
+ const editorStyles=StyleSheet.create({
+   backdrop:{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'#000000aa',justifyContent:'flex-end'},
+   sheet:{backgroundColor:colors.card,borderTopLeftRadius:16,borderTopRightRadius:16,padding:spacing(1.5),gap:spacing(1)},
+   settingsToggle:{paddingVertical:spacing(1),paddingHorizontal:spacing(1.5),borderRadius:8,borderWidth:1,borderColor:colors.border,backgroundColor:'#111214',marginBottom:spacing(1)},
+   settingsToggleText:{color:colors.text,fontSize:16,fontWeight:'700'},
+   sectionTitle:{color:colors.text,fontSize:16,fontWeight:'800',marginBottom:spacing(1)},
   chip:{paddingHorizontal:10,paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:colors.border},
   chipOn:{backgroundColor:'#1f2937',borderColor:'#1f2937'},
   chipText:{color:colors.subtext,fontSize:12,fontWeight:'400'},

@@ -54,7 +54,7 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
 
       {task.subtasks?.length?(<View style={{marginTop:spacing(1)}}>
         <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-          <Text style={styles.sectionTitle}>Подзадачи</Text>
+          <Text style={styles.sectionTitle}>Цели</Text>
         </View>
         <View style={{marginTop:spacing(1)}}>
           {task.subtasks.map((s:Subtask)=>(
