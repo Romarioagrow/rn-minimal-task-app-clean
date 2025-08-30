@@ -1,4 +1,4 @@
-export type CategoryKey = 'work'|'home'|'global'|'habit'|'personal'|'urgent';
+export type CategoryKey = 'work'|'home'|'global'|'habit'|'personal'|'urgent'|string;
 
 export interface Subtask {
   id: string;

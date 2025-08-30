@@ -4,9 +4,9 @@ import{colors,radius,spacing,font}from'../theme';
 import CategoryPill from './CategoryPill';
 import type{Task,Subtask,CategoryKey}from'../types';
 
-interface Props{task:Task;onToggle:(id:string)=>void;onToggleSub:(taskId:string,subId:string)=>void;onDelete:(id:string)=>void;}
+interface Props{task:Task;onToggle:(id:string)=>void;onToggleSub:(taskId:string,subId:string)=>void;onDelete:(id:string)=>void;customCategories?:string[];}
 
-export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
+export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCategories=[]}:Props){
   const[open,setOpen]=useState(Boolean(task.subtasks?.length));
   useEffect(()=>{if((task.subtasks?.length||0)>0&&!open){setOpen(true);}},[task.subtasks?.length]);
   const toggleOpen=()=>{LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);setOpen(v=>!v);} ;
@@ -47,7 +47,7 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
        </View>
 
       <View style={{flexDirection:'row',gap:8,flexWrap:'wrap',marginBottom:spacing(1)}}>
-        {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c}/>))}
+        {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c} customCategories={customCategories}/>))}
       </View>
 
              <View style={{flexDirection:'row',gap:spacing(1.5),flexWrap:'wrap',marginBottom:spacing(1)}}>
