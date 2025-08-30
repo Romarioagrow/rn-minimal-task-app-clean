@@ -3,6 +3,7 @@ import{View,Text,StyleSheet,FlatList,TouchableOpacity,TextInput,KeyboardAvoiding
 import { SafeAreaView } from 'react-native-safe-area-context';
 import{colors,spacing}from'../theme';
 import TaskItem from'../components/TaskItem';
+
 import type{Task,CategoryKey}from'../types';
 import{loadTasks,saveTasks}from'../storage';
 
@@ -49,6 +50,7 @@ const renderItem=useCallback(({item}:{item:Task})=> (
 return(
   <SafeAreaView style={styles.safe} edges={['top','left','right','bottom']}>
     <View style={styles.container}>
+
       <Text style={styles.h1}>Задачи</Text>
       <Text style={styles.caption}>Всего: {list.length} • Активных: {list.filter(t=>!t.done).length}</Text>
       <View style={styles.filters}>
@@ -65,7 +67,7 @@ return(
         data={list}
         keyExtractor={i=>i.id}
         renderItem={renderItem}
-        contentContainerStyle={{paddingBottom:spacing(12)}}
+        contentContainerStyle={{paddingBottom:spacing(8)}}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         updateCellsBatchingPeriod={50}
@@ -114,16 +116,16 @@ return(
 
 const styles=StyleSheet.create({
 safe:{flex:1,backgroundColor:colors.bg},
-container:{flex:1,paddingHorizontal:spacing(2),paddingTop:spacing(1)},
-h1:{color:'#ffffff',fontSize:34,fontWeight:'800'},
-caption:{color:'#a3a3aa',marginBottom:spacing(1)},
-filters:{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginBottom:spacing(2)},
-fbtn:{paddingHorizontal:spacing(1.5),paddingVertical:6,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e'},
+container:{flex:1,paddingHorizontal:spacing(1.5),paddingTop:spacing(1)},
+h1:{color:'#ffffff',fontSize:24,fontWeight:'800'},
+caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontWeight:'400'},
+filters:{flexDirection:'row',flexWrap:'wrap',gap:6,marginBottom:spacing(1.5)},
+fbtn:{paddingHorizontal:spacing(1),paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e'},
 fbtnOn:{backgroundColor:'#1f2937'},
-ftext:{color:'#a3a3aa'},
+ftext:{color:'#a3a3aa',fontSize:12,fontWeight:'500'},
 ftextOn:{color:'#ffffff',fontWeight:'700'},
-fab:{position:'absolute',right:spacing(2),bottom:spacing(2),width:56,height:56,borderRadius:28,backgroundColor:'#ffcc00',alignItems:'center',justifyContent:'center'},
-fabPlus:{fontSize:30,fontWeight:'700'}
+fab:{position:'absolute',right:spacing(2),bottom:spacing(2),width:48,height:48,borderRadius:24,backgroundColor:'#ffcc00',alignItems:'center',justifyContent:'center'},
+fabPlus:{fontSize:24,fontWeight:'700'}
 });
 
 // Редактор задачи — простая модалка без сторонних библиотек
@@ -175,7 +177,7 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
       <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':undefined}>
         <View style={editorStyles.sheet}>
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{paddingBottom:spacing(4)}}>
-            <Input value={title} onChangeText={setTitle} placeholder="Название задачи" style={{marginBottom:spacing(2),height:56,borderRadius:14}}/>
+            <Input value={title} onChangeText={setTitle} placeholder="Название задачи" style={{marginBottom:spacing(2),height:44,borderRadius:10}}/>
 
             <Text style={editorStyles.sectionTitle}>Категории (можно несколько:)</Text>
             <View style={{flexDirection:'row',flexWrap:'wrap',gap:spacing(1),marginTop:spacing(1),marginBottom:spacing(2)}}>
@@ -342,17 +344,17 @@ function Input({value,onChangeText,placeholder,style,multiline}:{value:string;on
 
 const editorStyles=StyleSheet.create({
   backdrop:{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'#000000aa',justifyContent:'flex-end'},
-  sheet:{backgroundColor:colors.card,borderTopLeftRadius:18,borderTopRightRadius:18,padding:spacing(2),gap:spacing(1)},
-  sectionTitle:{color:colors.text,fontSize:18,fontWeight:'800',marginBottom:spacing(1)},
-  chip:{paddingHorizontal:12,paddingVertical:6,borderRadius:999,borderWidth:1,borderColor:colors.border},
+  sheet:{backgroundColor:colors.card,borderTopLeftRadius:16,borderTopRightRadius:16,padding:spacing(1.5),gap:spacing(1)},
+  sectionTitle:{color:colors.text,fontSize:16,fontWeight:'800',marginBottom:spacing(1)},
+  chip:{paddingHorizontal:10,paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:colors.border},
   chipOn:{backgroundColor:'#1f2937',borderColor:'#1f2937'},
-  chipText:{color:colors.subtext,fontSize:14},
+  chipText:{color:colors.subtext,fontSize:12,fontWeight:'400'},
   chipTextOn:{color:'#fff',fontWeight:'700'},
-  input:{borderWidth:1,borderColor:colors.border,borderRadius:10,paddingHorizontal:12,paddingVertical:12},
-  settingsCard:{backgroundColor:'#111214',borderRadius:18,borderWidth:1,borderColor:colors.border,marginBottom:spacing(2)},
-  settingsRow:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:spacing(2),paddingVertical:spacing(1.5),borderBottomWidth:1,borderBottomColor:'#1c1d22'},
-  settingsLabel:{color:colors.text,fontSize:18,fontWeight:'700'},
-  settingsValue:{color:colors.text,fontSize:18,fontWeight:'700'},
-  catChip:{paddingHorizontal:14,paddingVertical:8,borderRadius:999,borderWidth:1},
-  catChipText:{fontSize:16,fontWeight:'700'}
+  input:{borderWidth:1,borderColor:colors.border,borderRadius:8,paddingHorizontal:10,paddingVertical:8},
+  settingsCard:{backgroundColor:'#111214',borderRadius:14,borderWidth:1,borderColor:colors.border,marginBottom:spacing(2)},
+  settingsRow:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:spacing(1.5),paddingVertical:spacing(1),borderBottomWidth:1,borderBottomColor:'#1c1d22'},
+  settingsLabel:{color:colors.text,fontSize:14,fontWeight:'700'},
+  settingsValue:{color:colors.text,fontSize:14,fontWeight:'700'},
+  catChip:{paddingHorizontal:12,paddingVertical:6,borderRadius:999,borderWidth:1},
+  catChipText:{fontSize:14,fontWeight:'700'}
 });
