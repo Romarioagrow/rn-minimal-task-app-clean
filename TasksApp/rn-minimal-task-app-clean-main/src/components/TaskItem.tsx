@@ -28,71 +28,124 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
   return (
     <View style={styles.swipeContainer}>
       <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
-      <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
-             <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
-                   <TouchableOpacity onPress={()=>{
-            onToggle(task.id);
-            // Если задача отмечается как выполненная, то все цели тоже отмечаются как выполненные
-            if (!task.done && task.subtasks?.length) {
-              task.subtasks.forEach(subtask => {
-                if (!subtask.done) {
-                  onToggleSub(task.id, subtask.id);
+             <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
+         
+         {/* Блок категорий */}
+         {task.categories.length > 0 && (
+           <View style={styles.categoriesTopBlock}>
+             <View style={styles.categoriesContainer}>
+               {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c} customCategories={customCategories}/>))}
+             </View>
+           </View>
+         )}
+
+                   {/* Заголовок задачи */}
+          <View style={[
+            styles.headerBlock,
+            // Если только название и больше ничего нет, добавляем равные отступы
+            (!task.subtasks?.length && !task.categories.length && !task.dueAt && !task.repeat && typeof task.reminderMinutesBefore !== 'number' && !task.priority && !task.notes) && styles.headerBlockAlone
+          ]}>
+            <View style={styles.titleRow}>
+              <TouchableOpacity onPress={()=>{
+                onToggle(task.id);
+                if (!task.done && task.subtasks?.length) {
+                  task.subtasks.forEach(subtask => {
+                    if (!subtask.done) {
+                      onToggleSub(task.id, subtask.id);
+                    }
+                  });
                 }
-              });
-            }
-          }} onLongPress={toggleOpen}>
-           <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
-         </TouchableOpacity>
-                                       <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginRight:spacing(0.5)}]}>{task.title||'(без названия)'}</Text>
-       </View>
+              }} onLongPress={toggleOpen}>
+                <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
+              </TouchableOpacity>
+              <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginLeft:spacing(1.5)}]}>
+                {task.title||'(без названия)'}
+              </Text>
+            </View>
+          </View>
 
-      <View style={{flexDirection:'row',gap:8,flexWrap:'wrap',marginBottom:spacing(1)}}>
-        {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c} customCategories={customCategories}/>))}
-      </View>
+         {/* Блок целей */}
+         {task.subtasks?.length > 0 && (
+           <View style={styles.contentBlock}>
+             <Text style={styles.blockTitle}>Цели</Text>
+             <View style={styles.goalsContainer}>
+               {task.subtasks.map((s:Subtask)=>(
+                 <TouchableOpacity key={s.id} style={styles.goalItem} onPress={()=>{
+                   onToggleSub(task.id,s.id);
+                   const updatedSubtasks = task.subtasks.map(sub => 
+                     sub.id === s.id ? { ...sub, done: !sub.done } : sub
+                   );
+                   const allDone = updatedSubtasks.every(sub => sub.done);
+                   if (allDone && !task.done) {
+                     onToggle(task.id);
+                   }
+                 }}>
+                   <View style={[styles.goalDot,s.done&&styles.goalDotOn]}/>
+                   <Text style={[styles.goalText,s.done&&styles.goalDone]}>{s.title}</Text>
+                 </TouchableOpacity>
+               ))}
+             </View>
+             <View style={styles.progressContainer}>
+               <View style={styles.progressWrap}>
+                 <View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} />
+               </View>
+             </View>
+           </View>
+         )}
 
-             <View style={{flexDirection:'row',gap:spacing(1.5),flexWrap:'wrap',marginBottom:spacing(1)}}>
-         {task.dueAt?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🗓️</Text><Text style={styles.metaText}>{new Date(task.dueAt).toLocaleDateString()} , {new Date(task.dueAt).toLocaleTimeString().slice(0,5)}</Text></View>):null}
-         {task.repeat?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔁</Text><Text style={styles.metaText}>Повтор {repeatLabel(task.repeat).toLowerCase()}</Text></View>):null}
-         {typeof task.reminderMinutesBefore==='number'?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔔</Text><Text style={styles.metaText}>За {task.reminderMinutesBefore} мин</Text></View>):null}
-         {task.priority?(<View style={styles.metaRow}><Text style={styles.metaIcon}>📌</Text><Text style={styles.metaText}>{task.priority==='high'?'Высокий':task.priority==='medium'?'Средний':'Низкий'} приоритет</Text></View>):null}
-       </View>
+        {/* Блок планирования */}
+        {(task.dueAt || task.repeat || typeof task.reminderMinutesBefore === 'number' || task.priority) && (
+          <View style={styles.contentBlock}>
+            <Text style={styles.blockTitle}>Планирование</Text>
+            <View style={styles.planningContainer}>
+              {task.dueAt && (
+                <View style={styles.planningItem}>
+                  <Text style={styles.planningIcon}>🗓️</Text>
+                  <Text style={styles.planningText}>
+                    {new Date(task.dueAt).toLocaleDateString()} , {new Date(task.dueAt).toLocaleTimeString().slice(0,5)}
+                  </Text>
+                </View>
+              )}
+              {task.repeat && (
+                <View style={styles.planningItem}>
+                  <Text style={styles.planningIcon}>🔁</Text>
+                  <Text style={styles.planningText}>Повтор {repeatLabel(task.repeat).toLowerCase()}</Text>
+                </View>
+              )}
+              {typeof task.reminderMinutesBefore === 'number' && (
+                <View style={styles.planningItem}>
+                  <Text style={styles.planningIcon}>🔔</Text>
+                  <Text style={styles.planningText}>За {task.reminderMinutesBefore} мин</Text>
+                </View>
+              )}
+              {task.priority && (
+                <View style={styles.planningItem}>
+                  <Text style={styles.planningIcon}>📌</Text>
+                  <Text style={styles.planningText}>
+                    {task.priority === 'high' ? 'Высокий' : task.priority === 'medium' ? 'Средний' : 'Низкий'} приоритет
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
 
-             {task.notes?(<View style={{marginVertical:spacing(1)}}>
-         <Text style={styles.sectionTitle}>Заметки</Text>
-         <Text style={styles.notes}>{task.notes}</Text>
-       </View>):null}
+        {/* Блок заметок */}
+        {task.notes && (
+          <View style={styles.contentBlock}>
+            <Text style={styles.blockTitle}>Заметки</Text>
+            <Text style={styles.notesText}>{task.notes}</Text>
+          </View>
+        )}
 
-      {task.subtasks?.length?(<View style={{marginTop:spacing(1)}}>
-        <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-          <Text style={styles.sectionTitle}>Цели</Text>
-        </View>
-        <View style={{marginTop:spacing(1)}}>
-          {task.subtasks.map((s:Subtask)=>(
-                         <TouchableOpacity key={s.id} style={styles.subrow} onPress={()=>{
-               onToggleSub(task.id,s.id);
-               // Проверяем, все ли цели выполнены после изменения
-               const updatedSubtasks = task.subtasks.map(sub => 
-                 sub.id === s.id ? { ...sub, done: !sub.done } : sub
-               );
-               const allDone = updatedSubtasks.every(sub => sub.done);
-               // Если все цели выполнены и задача еще не выполнена, отмечаем задачу как выполненную
-               if (allDone && !task.done) {
-                 onToggle(task.id);
-               }
-             }}>
-               <View style={[styles.subDot,s.done&&styles.subDotOn]}/>
-               <Text style={[styles.subtext,s.done&&styles.subdone]}>{s.title}</Text>
-             </TouchableOpacity>
-          ))}
-        </View>
-        <View style={styles.progressWrap}><View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} /></View>
-      </View>):null}
-
-             <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
-       <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-         {task.done ? (
-           <>
-                           <Text style={styles.footerText}>
+        {/* Разделитель */}
+        <View style={styles.divider}/>
+        
+        {/* Футер */}
+        <View style={styles.footerBlock}>
+          {task.done ? (
+            <>
+              <Text style={styles.footerText}>
                 Завершено {task.completedAt ? new Date(task.completedAt).toLocaleDateString() : new Date().toLocaleDateString()}
               </Text>
               <Text style={styles.footerText}>
@@ -115,8 +168,8 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
                   }
                 })()}
               </Text>
-           </>
-                   ) : (
+            </>
+          ) : (
             <>
               <Text style={styles.footerText}>
                 Создано {new Date(task.createdAt).toLocaleDateString()}
@@ -126,37 +179,190 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
               </Text>
             </>
           )}
-       </View>
+        </View>
       </Animated.View>
     </View>
   );
 }
 
 const styles=StyleSheet.create({
-  swipeContainer:{marginBottom:spacing(1.5),position:'relative',borderRadius:radius.lg,overflow:'hidden'},
-  deleteBg:{...StyleSheet.absoluteFillObject,backgroundColor:'#7f1d1d',justifyContent:'center',alignItems:'flex-end',paddingRight:spacing(2)},
-  deleteText:{color:'#fff',fontWeight:'800'},
-  card:{backgroundColor:colors.card,borderRadius:radius.lg,padding:spacing(1.5),borderWidth:1,borderColor:colors.border},
-  header:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:spacing(1)},
-  row:{flexDirection:'row',alignItems:'center',gap:spacing(1.5)},
-  checkbox:{width:20,height:20,borderRadius:10,borderWidth:2,borderColor:colors.border,backgroundColor:'transparent'},
-  checkboxOn:{backgroundColor:colors.accent,borderColor:colors.accent},
-  title:{color:colors.text,fontSize:font.title,fontWeight:'700'},
-  done:{color:colors.subtext,textDecorationLine:'line-through'},
-  time:{color:colors.subtext,fontSize:14,fontWeight:'400'},
-  subs:{marginTop:spacing(1),paddingLeft:spacing(2)},
-  subrow:{flexDirection:'row',alignItems:'center',gap:spacing(1),paddingVertical:6,paddingHorizontal:spacing(1),borderRadius:8},
-  subDot:{width:16,height:16,borderRadius:8,borderWidth:2,borderColor:colors.border,backgroundColor:'transparent'},
-  subDotOn:{backgroundColor:colors.accent,borderColor:colors.accent},
-  subtext:{color:colors.text,fontSize:font.text,fontWeight:'400'},
-  subdone:{textDecorationLine:'line-through',color:'#6b7280'},
-  titleLarge:{color:colors.text,fontSize:22,fontWeight:'800',marginBottom:spacing(1)},
-  metaRow:{flexDirection:'row',alignItems:'center',gap:6},
-  metaIcon:{color:colors.subtext},
-  metaText:{color:colors.subtext,fontSize:12,fontWeight:'700'},
-  sectionTitle:{color:colors.text,fontSize:16,fontWeight:'800'},
-  notes:{color:colors.subtext,fontWeight:'400'},
-  progressWrap:{height:6,backgroundColor:'#2a2a2e',borderRadius:3,overflow:'hidden',marginTop:spacing(1)},
-  progressFill:{height:6,backgroundColor:colors.accent},
-  footerText:{color:colors.subtext,fontWeight:'400'}
+  // Контейнер для свайпа
+  swipeContainer:{
+    marginBottom:spacing(2),
+    position:'relative',
+    borderRadius:radius.lg,
+    overflow:'hidden'
+  },
+  
+  // Фон для удаления
+  deleteBg:{
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor:'#7f1d1d',
+    justifyContent:'center',
+    alignItems:'flex-end',
+    paddingRight:spacing(2)
+  },
+  deleteText:{
+    color:'#fff',
+    fontWeight:'800'
+  },
+  
+  // Основная карточка
+  card:{
+    backgroundColor:colors.card,
+    borderRadius:radius.lg,
+    padding:spacing(2),
+    borderWidth:1,
+    borderColor:colors.border
+  },
+  
+  // Блок заголовка
+  headerBlock:{
+    marginBottom:spacing(1.75)
+  },
+  headerBlockAlone:{
+    marginTop:spacing(1.75),
+    marginBottom:spacing(1.75)
+  },
+  titleRow:{
+    flexDirection:'row',
+    alignItems:'center'
+  },
+  checkbox:{
+    width:24,
+    height:24,
+    borderRadius:12,
+    borderWidth:2,
+    borderColor:colors.border,
+    backgroundColor:'transparent'
+  },
+  checkboxOn:{
+    backgroundColor:colors.accent,
+    borderColor:colors.accent
+  },
+  titleLarge:{
+    color:colors.text,
+    fontSize:22,
+    fontWeight:'800'
+  },
+  done:{
+    color:colors.subtext,
+    textDecorationLine:'line-through'
+  },
+  
+  // Общие стили для контентных блоков
+  contentBlock:{
+    marginBottom:spacing(1.75)
+  },
+  blockTitle:{
+    color:colors.text,
+    fontSize:16,
+    fontWeight:'800',
+    marginBottom:spacing(1)
+  },
+  
+  // Блок категорий
+  categoriesTopBlock:{
+    marginBottom:spacing(1.25)
+  },
+  categoriesContainer:{
+    flexDirection:'row',
+    gap:8,
+    flexWrap:'wrap'
+  },
+  
+  // Блок планирования
+  planningContainer:{
+    gap:spacing(0.75)
+  },
+  planningItem:{
+    flexDirection:'row',
+    alignItems:'center',
+    gap:8
+  },
+  planningIcon:{
+    color:colors.subtext,
+    fontSize:16
+  },
+  planningText:{
+    color:colors.subtext,
+    fontSize:14,
+    fontWeight:'500'
+  },
+  
+  // Блок заметок
+  notesText:{
+    color:colors.subtext,
+    fontSize:14,
+    fontWeight:'400',
+    lineHeight:20
+  },
+  
+  // Блок целей
+  goalsContainer:{
+    gap:spacing(0.25),
+    marginBottom:spacing(1)
+  },
+  goalItem:{
+    flexDirection:'row',
+    alignItems:'center',
+    gap:spacing(1),
+    paddingVertical:6,
+    paddingHorizontal:spacing(1),
+    borderRadius:8
+  },
+  goalDot:{
+    width:16,
+    height:16,
+    borderRadius:8,
+    borderWidth:2,
+    borderColor:colors.border,
+    backgroundColor:'transparent'
+  },
+  goalDotOn:{
+    backgroundColor:colors.accent,
+    borderColor:colors.accent
+  },
+  goalText:{
+    color:colors.text,
+    fontSize:14,
+    fontWeight:'400',
+    flex:1
+  },
+  goalDone:{
+    textDecorationLine:'line-through',
+    color:colors.subtext
+  },
+  progressContainer:{
+    marginTop:spacing(1)
+  },
+  progressWrap:{
+    height:6,
+    backgroundColor:'#2a2a2e',
+    borderRadius:3,
+    overflow:'hidden'
+  },
+  progressFill:{
+    height:6,
+    backgroundColor:colors.accent
+  },
+  
+  // Разделитель
+  divider:{
+    height:1,
+    backgroundColor:colors.border,
+    marginVertical:spacing(1.5)
+  },
+  
+  // Футер
+  footerBlock:{
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center'
+  },
+  footerText:{
+    color:colors.subtext,
+    fontSize:12,
+    fontWeight:'400'
+  }
 })
