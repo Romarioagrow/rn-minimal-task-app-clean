@@ -145,6 +145,7 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
    const [repeatOpen,setRepeatOpen]=useState(false);
    const [settingsOpen,setSettingsOpen]=useState(false);
    const [categoriesOpen,setCategoriesOpen]=useState(false);
+   const [goalsOpen,setGoalsOpen]=useState(false);
 
   const CATEGORY_LABELS:Record<CategoryKey,string>={work:'Работа',home:'Дом',global:'Глобальное',habit:'Повтор',personal:'Личное',urgent:'Срочно'};
   const toggleCategory=(c:CategoryKey)=>setCategories(prev=>prev.includes(c)?prev.filter(x=>x!==c):[...prev,c]);
@@ -302,29 +303,41 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                                  </View>
                ):null}
              </View>
+                          )}
+
+             <TouchableOpacity 
+               style={editorStyles.settingsToggle} 
+               onPress={() => setGoalsOpen(!goalsOpen)}
+             >
+               <Text style={editorStyles.settingsToggleText}>
+                 {goalsOpen ? '▼' : '▶'} Цели
+               </Text>
+             </TouchableOpacity>
+
+             {goalsOpen && (
+             <View style={{gap:8,marginTop:spacing(1)}}>
+               {subtasks.map(s=>(
+                 <View key={s.id} style={{flexDirection:'row',alignItems:'center',gap:10}}>
+                   <View style={{width:20,height:20,borderRadius:10,borderWidth:2,borderColor:colors.border}}/>
+                   <View style={{flex:1}}>
+                     <TextInput
+                       value={s.title}
+                       onChangeText={(txt)=>updateSub(s.id,txt)}
+                       placeholder="Текст цели"
+                       placeholderTextColor={colors.subtext}
+                       style={[editorStyles.input,{paddingVertical:10}]}
+                     />
+                   </View>
+                   <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
+                 </View>
+               ))}
+                              <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginLeft:spacing(1)}}>
+                 <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
+               </TouchableOpacity>
+             </View>
              )}
 
-            <Text style={editorStyles.sectionTitle}>Подзадачи:</Text>
-            <View style={{gap:8,marginTop:spacing(1)}}>
-              {subtasks.map(s=>(
-                <View key={s.id} style={{flexDirection:'row',alignItems:'center',gap:10}}>
-                  <View style={{width:20,height:20,borderRadius:10,borderWidth:2,borderColor:colors.border}}/>
-                  <View style={{flex:1}}>
-                    <TextInput
-                      value={s.title}
-                      onChangeText={(txt)=>updateSub(s.id,txt)}
-                      placeholder="Текст подзадачи"
-                      placeholderTextColor={colors.subtext}
-                      style={[editorStyles.input,{paddingVertical:10}]}
-                    />
-                  </View>
-                  <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity onPress={addSub}><Text style={{color:colors.text,fontWeight:'700'}}>+ Добавить подзадачу</Text></TouchableOpacity>
-            </View>
-
-            <Text style={editorStyles.sectionTitle}>Заметки</Text>
+             <Text style={[editorStyles.sectionTitle, {marginTop: spacing(2)}]}>Заметки</Text>
             <Input value={notes} onChangeText={setNotes} placeholder="Заметки" multiline style={{marginTop:spacing(1)}}/>
 
             <View style={{flexDirection:'row',justifyContent:'space-between',marginTop:spacing(2)}}>
