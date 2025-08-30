@@ -1,0 +1,1 @@
+export const colors={bg:'#0b0b0c',card:'#151517',text:'#f5f5f7',subtext:'#a3a3aa',border:'#2a2a2e',accent:'#ffcc00',categories:{work:'#3b82f6',home:'#d9b300',global:'#ef4444',habit:'#60a5fa',personal:'#34d399',urgent:'#f97316'}};export const spacing=(n:number)=>n*8;export const radius={xl:18,lg:14,md:10,sm:8};export const font={title:22,text:16,small:13};
