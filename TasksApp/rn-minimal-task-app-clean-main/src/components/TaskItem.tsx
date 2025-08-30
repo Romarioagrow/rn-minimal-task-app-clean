@@ -77,8 +77,33 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
         <View style={styles.progressWrap}><View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} /></View>
       </View>):null}
 
-      <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
-      <Text style={styles.footerText}>Создано {new Date(task.createdAt).toLocaleDateString()} {task.updatedAt?` · Обновлено ${new Date(task.updatedAt).toLocaleDateString()}`:''}</Text>
+             <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
+       <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+         <Text style={styles.footerText}>
+           {task.done 
+             ? `Завершено ${new Date().toLocaleDateString()}`
+             : `Создано ${new Date(task.createdAt).toLocaleDateString()}${task.updatedAt ? ` · Обновлено ${new Date(task.updatedAt).toLocaleDateString()}` : ''}`
+           }
+         </Text>
+         {task.done && (
+           <Text style={styles.footerText}>
+             {(() => {
+               const createdTime = new Date(task.createdAt).getTime();
+               const completedTime = new Date().getTime();
+               const durationMs = completedTime - createdTime;
+               const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+               const durationDays = Math.floor(durationHours / 24);
+               
+                               if (durationDays > 0) {
+                  return `Выполнено за ${durationDays} дн.`;
+                } else {
+                  const durationMinutes = Math.floor(durationMs / (1000 * 60));
+                  return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+                }
+             })()}
+           </Text>
+         )}
+       </View>
       </Animated.View>
     </View>
   );
