@@ -19,4 +19,5 @@ export interface Task {
   done: boolean;
   createdAt: string;
   updatedAt?: string;
+  completedAt?: string; // время завершения задачи
 }

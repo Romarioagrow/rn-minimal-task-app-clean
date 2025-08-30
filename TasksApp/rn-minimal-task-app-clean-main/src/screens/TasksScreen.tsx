@@ -52,7 +52,17 @@ const getCategoryLabels = useCallback(() => {
 }, [customCategories]);
 
 const toggle=useCallback((id:string)=>{
-  setTasks(prev=>prev.map(t=>t.id===id?{...t,done:!t.done,updatedAt:new Date().toISOString()}:t));
+  setTasks(prev=>prev.map(t=>{
+    if(t.id!==id) return t;
+    const newDone = !t.done;
+    return {
+      ...t,
+      done: newDone,
+      updatedAt: new Date().toISOString(),
+      // Устанавливаем время завершения только при первом завершении
+      completedAt: newDone && !t.completedAt ? new Date().toISOString() : t.completedAt
+    };
+  }));
 },[]);
 const toggleSub=useCallback((taskId:string,subId:string)=>{
   setTasks(prev=>prev.map(t=>{
@@ -118,7 +128,8 @@ return(
           categories:[],
           done:false,
           createdAt:new Date().toISOString(),
-          subtasks:[]
+          subtasks:[],
+          // Не устанавливаем updatedAt при создании новой задачи
         };
         setDraftTask(draft);
         setEditingTaskId(null);
@@ -448,7 +459,10 @@ function TaskEditor({task,customCategories,onClose,onSave,onDelete,onAddCustomCa
                   reminderMinutesBefore: typeof reminder==='number'?reminder:undefined,
                   priority:priority||undefined,
                   subtasks:subtasks.filter(s=>s.title.trim().length>0),
-                  updatedAt:new Date().toISOString()
+                  // Устанавливаем updatedAt только при редактировании существующей задачи
+                  updatedAt: task.updatedAt ? new Date().toISOString() : undefined,
+                  // Сохраняем время завершения если задача была завершена
+                  completedAt: task.completedAt
                 })}><Text style={{color:colors.accent,fontWeight:'800'}}>Сохранить</Text></TouchableOpacity>
               </View>
             </View>
