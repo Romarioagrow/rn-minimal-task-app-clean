@@ -410,11 +410,11 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 18,
     color: colors.text,
-    fontWeight: '600',
+    fontFamily: 'PTSansCaption-Bold',
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
     color: colors.text,
   },
   actionButton: {
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
     color: '#000',
   },
   content: {
@@ -437,13 +437,13 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: 'PTSansCaption-Bold',
     color: colors.text,
     marginBottom: spacing(1.5),
   },
   titleInput: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
     color: colors.text,
     backgroundColor: colors.card,
     borderRadius: 12,
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
     color: colors.text,
     lineHeight: 28,
   },
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: 'PTSansCaption-Bold',
   },
   goalsContainer: {
     gap: spacing(1),
@@ -494,6 +494,7 @@ const styles = StyleSheet.create({
   goalInput: {
     flex: 1,
     fontSize: 16,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.text,
     backgroundColor: colors.card,
     borderRadius: 8,
@@ -502,6 +503,7 @@ const styles = StyleSheet.create({
   goalText: {
     flex: 1,
     fontSize: 16,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.text,
   },
   goalTextDone: {
@@ -519,7 +521,7 @@ const styles = StyleSheet.create({
   removeGoalText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'PTSansCaption-Bold',
   },
   addGoalButton: {
     paddingVertical: spacing(1),
@@ -532,7 +534,7 @@ const styles = StyleSheet.create({
   addGoalText: {
     color: colors.accent,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: 'PTSansCaption-Bold',
   },
   infoRow: {
     flexDirection: 'row',
@@ -544,11 +546,12 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'PTSansCaption-Bold',
     color: colors.text,
   },
   infoValue: {
     fontSize: 16,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.subtext,
     textAlign: 'right',
     flex: 1,
@@ -564,6 +567,7 @@ const styles = StyleSheet.create({
     padding: spacing(1),
     color: colors.text,
     fontSize: 14,
+    fontFamily: 'PTSansCaption-Regular',
     minWidth: 100,
   },
   timeInput: {
@@ -572,6 +576,7 @@ const styles = StyleSheet.create({
     padding: spacing(1),
     color: colors.text,
     fontSize: 14,
+    fontFamily: 'PTSansCaption-Regular',
     minWidth: 80,
   },
   repeatOptions: {
@@ -591,11 +596,12 @@ const styles = StyleSheet.create({
   },
   repeatChipText: {
     fontSize: 12,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.subtext,
   },
   repeatChipTextSelected: {
     color: '#000',
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
   },
   reminderOptions: {
     flexDirection: 'row',
@@ -615,11 +621,12 @@ const styles = StyleSheet.create({
   },
   reminderChipText: {
     fontSize: 12,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.subtext,
   },
   reminderChipTextSelected: {
     color: '#000',
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
   },
   priorityOptions: {
     flexDirection: 'row',
@@ -638,11 +645,12 @@ const styles = StyleSheet.create({
   },
   priorityChipText: {
     fontSize: 12,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.subtext,
   },
   priorityChipTextSelected: {
     color: '#000',
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
   },
   notesInput: {
     backgroundColor: colors.card,
@@ -650,10 +658,12 @@ const styles = StyleSheet.create({
     padding: spacing(2),
     color: colors.text,
     fontSize: 16,
+    fontFamily: 'PTSansCaption-Regular',
     minHeight: 100,
   },
   notesText: {
     fontSize: 16,
+    fontFamily: 'PTSansCaption-Regular',
     color: colors.text,
     lineHeight: 24,
     backgroundColor: colors.card,
@@ -675,6 +685,6 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: 'PTSansCaption-Bold',
   },
 });

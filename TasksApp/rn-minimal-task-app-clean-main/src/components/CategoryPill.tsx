@@ -31,5 +31,5 @@ export default function CategoryPill({ category, customCategories = [] }:{ categ
 
 const styles=StyleSheet.create({
   pill:{paddingVertical:3,paddingHorizontal:spacing(1),borderRadius:radius.md,alignSelf:'flex-start',borderWidth:1},
-  text:{fontSize:10,fontWeight:'700',letterSpacing:0.5}
+  text:{fontSize:10,fontFamily:'PTSansCaption-Bold',letterSpacing:0.5}
 });

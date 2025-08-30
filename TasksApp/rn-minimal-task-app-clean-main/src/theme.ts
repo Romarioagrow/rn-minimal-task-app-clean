@@ -32,11 +32,13 @@ export const font = {
   text: 14,
   small: 11,
   
-  // Семейства шрифтов - используем системные шрифты
+  // Семейства шрифтов - используем PT Sans Caption
   family: {
-    // Основной шрифт - системный без засечек
-    primary: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
-    // Альтернативный шрифт - системный с засечками
+    // Основной шрифт - PT Sans Caption
+    primary: 'PTSansCaption-Regular',
+    // Жирный шрифт - PT Sans Caption Bold
+    bold: 'PTSansCaption-Bold',
+    // Альтернативный шрифт
     secondary: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
     // Моноширинный шрифт
     mono: Platform.OS === 'ios' ? 'SF Mono' : 'Roboto Mono'
