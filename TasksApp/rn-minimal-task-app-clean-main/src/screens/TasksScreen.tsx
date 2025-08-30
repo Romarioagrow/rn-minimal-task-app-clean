@@ -76,16 +76,25 @@ return(
 
       <Text style={styles.h1}>Задачи</Text>
       <Text style={styles.caption}>Всего: {list.length} • Активных: {list.filter(t=>!t.done).length}</Text>
-      <View style={styles.filters}>
-        <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
-          <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
-        </TouchableOpacity>
-        {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
-          <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
-            <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{getCategoryLabels()[c as CategoryKey]||String(c)}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+             <View style={styles.filtersContainer}>
+         <ScrollView 
+           horizontal
+           style={styles.filtersScroll}
+           showsHorizontalScrollIndicator={false}
+           nestedScrollEnabled={true}
+         >
+           <View style={styles.filters}>
+             <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
+               <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
+             </TouchableOpacity>
+             {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
+               <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
+                 <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{getCategoryLabels()[c as CategoryKey]||String(c)}</Text>
+               </TouchableOpacity>
+             ))}
+           </View>
+         </ScrollView>
+       </View>
       <FlatList
         data={list}
         keyExtractor={i=>i.id}
@@ -148,7 +157,9 @@ safe:{flex:1,backgroundColor:colors.bg},
 container:{flex:1,paddingHorizontal:spacing(1.5),paddingTop:spacing(1)},
 h1:{color:'#ffffff',fontSize:24,fontWeight:'800'},
 caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontWeight:'400'},
-filters:{flexDirection:'row',flexWrap:'wrap',gap:6,marginBottom:spacing(1.5)},
+filtersContainer:{marginBottom:spacing(2)},
+filtersScroll:{maxHeight:96}, // Ограничиваем высоту тремя строчками
+filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',width:600}, // Ширина больше экрана для переноса на 2-3 строки
 fbtn:{paddingHorizontal:spacing(1),paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e'},
 fbtnOn:{backgroundColor:'#1f2937'},
 ftext:{color:'#a3a3aa',fontSize:12,fontWeight:'500'},
