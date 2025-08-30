@@ -29,46 +29,96 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
     <View style={styles.swipeContainer}>
       <View style={styles.deleteBg}><Text style={styles.deleteText}>Удалить</Text></View>
       <Animated.View style={[styles.card,{transform:[{translateX}]}]} {...pan.panHandlers}>
-      <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
-        <TouchableOpacity onPress={()=>onToggle(task.id)} onLongPress={toggleOpen}>
-          <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
-        </TouchableOpacity>
-        <Text style={[styles.titleLarge,task.done&&styles.done]}>{task.title||'(без названия)'}</Text>
-      </View>
+             <View style={{flexDirection:'row',alignItems:'center',gap:spacing(1.5)}}>
+                   <TouchableOpacity onPress={()=>{
+            onToggle(task.id);
+            // Если задача отмечается как выполненная, то все цели тоже отмечаются как выполненные
+            if (!task.done && task.subtasks?.length) {
+              task.subtasks.forEach(subtask => {
+                if (!subtask.done) {
+                  onToggleSub(task.id, subtask.id);
+                }
+              });
+            }
+          }} onLongPress={toggleOpen}>
+           <View style={[styles.checkbox,task.done&&styles.checkboxOn]}/>
+         </TouchableOpacity>
+                                       <Text style={[styles.titleLarge,task.done&&styles.done,{flex:1,marginRight:spacing(0.5)}]}>{task.title||'(без названия)'}</Text>
+       </View>
 
       <View style={{flexDirection:'row',gap:8,flexWrap:'wrap',marginBottom:spacing(1)}}>
         {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c}/>))}
       </View>
 
-      <View style={{flexDirection:'row',gap:spacing(3),flexWrap:'wrap',marginBottom:spacing(1)}}>
-        {task.dueAt?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🗓️</Text><Text style={styles.metaText}>{new Date(task.dueAt).toLocaleDateString()} , {new Date(task.dueAt).toLocaleTimeString().slice(0,5)}</Text></View>):null}
-        {task.repeat?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔁</Text><Text style={styles.metaText}>Повтор {repeatLabel(task.repeat).toLowerCase()}</Text></View>):null}
-        {typeof task.reminderMinutesBefore==='number'?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔔</Text><Text style={styles.metaText}>За {task.reminderMinutesBefore} мин</Text></View>):null}
-        {task.priority?(<View style={styles.metaRow}><Text style={styles.metaIcon}>📌</Text><Text style={styles.metaText}>{task.priority==='high'?'Высокий':task.priority==='medium'?'Средний':'Низкий'} приоритет</Text></View>):null}
-      </View>
+             <View style={{flexDirection:'row',gap:spacing(1.5),flexWrap:'wrap',marginBottom:spacing(1)}}>
+         {task.dueAt?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🗓️</Text><Text style={styles.metaText}>{new Date(task.dueAt).toLocaleDateString()} , {new Date(task.dueAt).toLocaleTimeString().slice(0,5)}</Text></View>):null}
+         {task.repeat?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔁</Text><Text style={styles.metaText}>Повтор {repeatLabel(task.repeat).toLowerCase()}</Text></View>):null}
+         {typeof task.reminderMinutesBefore==='number'?(<View style={styles.metaRow}><Text style={styles.metaIcon}>🔔</Text><Text style={styles.metaText}>За {task.reminderMinutesBefore} мин</Text></View>):null}
+         {task.priority?(<View style={styles.metaRow}><Text style={styles.metaIcon}>📌</Text><Text style={styles.metaText}>{task.priority==='high'?'Высокий':task.priority==='medium'?'Средний':'Низкий'} приоритет</Text></View>):null}
+       </View>
 
-      {task.notes?(<View style={{marginVertical:spacing(1)}}>
-        <Text style={styles.sectionTitle}>Заметки</Text>
-        <Text style={styles.notes} numberOfLines={2}>{task.notes}</Text>
-      </View>):null}
+             {task.notes?(<View style={{marginVertical:spacing(1)}}>
+         <Text style={styles.sectionTitle}>Заметки</Text>
+         <Text style={styles.notes}>{task.notes}</Text>
+       </View>):null}
 
       {task.subtasks?.length?(<View style={{marginTop:spacing(1)}}>
         <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-          <Text style={styles.sectionTitle}>Подзадачи</Text>
+          <Text style={styles.sectionTitle}>Цели</Text>
         </View>
         <View style={{marginTop:spacing(1)}}>
           {task.subtasks.map((s:Subtask)=>(
-            <TouchableOpacity key={s.id} style={styles.subrow} onPress={()=>onToggleSub(task.id,s.id)}>
-              <View style={[styles.subDot,s.done&&styles.subDotOn]}/>
-              <Text style={[styles.subtext,s.done&&styles.subdone]}>{s.title}</Text>
-            </TouchableOpacity>
+                         <TouchableOpacity key={s.id} style={styles.subrow} onPress={()=>{
+               onToggleSub(task.id,s.id);
+               // Проверяем, все ли цели выполнены после изменения
+               const updatedSubtasks = task.subtasks.map(sub => 
+                 sub.id === s.id ? { ...sub, done: !sub.done } : sub
+               );
+               const allDone = updatedSubtasks.every(sub => sub.done);
+               // Если все цели выполнены и задача еще не выполнена, отмечаем задачу как выполненную
+               if (allDone && !task.done) {
+                 onToggle(task.id);
+               }
+             }}>
+               <View style={[styles.subDot,s.done&&styles.subDotOn]}/>
+               <Text style={[styles.subtext,s.done&&styles.subdone]}>{s.title}</Text>
+             </TouchableOpacity>
           ))}
         </View>
         <View style={styles.progressWrap}><View style={[styles.progressFill,{width:`${Math.round(progress*100)}%`}]} /></View>
       </View>):null}
 
-      <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
-      <Text style={styles.footerText}>Создано {new Date(task.createdAt).toLocaleDateString()} {task.updatedAt?` · Обновлено ${new Date(task.updatedAt).toLocaleDateString()}`:''}</Text>
+             <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
+       <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+         <Text style={styles.footerText}>
+           {task.done 
+             ? `Завершено ${new Date().toLocaleDateString()}`
+             : `Создано ${new Date(task.createdAt).toLocaleDateString()}${task.updatedAt ? ` · Обновлено ${new Date(task.updatedAt).toLocaleDateString()}` : ''}`
+           }
+         </Text>
+         {task.done && (
+           <Text style={styles.footerText}>
+             {(() => {
+               const createdTime = new Date(task.createdAt).getTime();
+               const completedTime = new Date().getTime();
+               const durationMs = completedTime - createdTime;
+               const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+               const durationDays = Math.floor(durationHours / 24);
+               
+                               if (durationDays > 0) {
+                  return `Выполнено за ${durationDays} дн.`;
+                } else {
+                  const durationMinutes = Math.floor(durationMs / (1000 * 60));
+                  if (durationHours > 0) {
+                    return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+                  } else {
+                    return `Выполнено за ${durationMinutes}м`;
+                  }
+                }
+             })()}
+           </Text>
+         )}
+       </View>
       </Animated.View>
     </View>
   );
