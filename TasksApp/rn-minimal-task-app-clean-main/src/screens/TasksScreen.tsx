@@ -320,13 +320,13 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                  <View key={s.id} style={{flexDirection:'row',alignItems:'center',gap:10}}>
                    <View style={{width:20,height:20,borderRadius:10,borderWidth:2,borderColor:colors.border}}/>
                    <View style={{flex:1}}>
-                     <TextInput
-                       value={s.title}
-                       onChangeText={(txt)=>updateSub(s.id,txt)}
-                       placeholder="Текст цели"
-                       placeholderTextColor={colors.subtext}
-                       style={[editorStyles.input,{paddingVertical:10}]}
-                     />
+                                           <TextInput
+                        value={s.title}
+                        onChangeText={(txt)=>updateSub(s.id,txt)}
+                        placeholder="Текст цели"
+                        placeholderTextColor={colors.subtext}
+                        style={[editorStyles.input,{paddingVertical:10,color:colors.text}]}
+                      />
                    </View>
                    <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
                  </View>
