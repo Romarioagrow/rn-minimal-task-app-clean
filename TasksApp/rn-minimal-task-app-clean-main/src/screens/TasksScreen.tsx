@@ -179,8 +179,9 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
     <View style={editorStyles.backdrop}>
       <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':undefined}>
         <View style={editorStyles.sheet}>
-          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{paddingBottom:spacing(4)}}>
-            <Input value={title} onChangeText={setTitle} placeholder="Название задачи" style={{marginBottom:spacing(2),height:44,borderRadius:10}}/>
+                     <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{paddingBottom:spacing(4)}}>
+             <Text style={editorStyles.sectionTitle}>Название</Text>
+                           <Input value={title} onChangeText={setTitle} placeholder="Что нужно сделать? Опишите вашу задачу..." multiline style={{marginBottom:spacing(2),height:80,borderRadius:10}}/>
 
                         <TouchableOpacity 
               style={editorStyles.settingsToggle} 
@@ -385,7 +386,7 @@ function Input({value,onChangeText,placeholder,style,multiline}:{value:string;on
    sheet:{backgroundColor:colors.card,borderTopLeftRadius:16,borderTopRightRadius:16,padding:spacing(1.5),gap:spacing(1)},
    settingsToggle:{paddingVertical:spacing(1),paddingHorizontal:spacing(1.5),borderRadius:8,borderWidth:1,borderColor:colors.border,backgroundColor:'#111214',marginBottom:spacing(1)},
    settingsToggleText:{color:colors.text,fontSize:16,fontWeight:'700'},
-   sectionTitle:{color:colors.text,fontSize:16,fontWeight:'800',marginBottom:spacing(1)},
+       sectionTitle:{color:colors.text,fontSize:17,fontWeight:'800',marginBottom:spacing(1)},
   chip:{paddingHorizontal:10,paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:colors.border},
   chipOn:{backgroundColor:'#1f2937',borderColor:'#1f2937'},
   chipText:{color:colors.subtext,fontSize:12,fontWeight:'400'},
