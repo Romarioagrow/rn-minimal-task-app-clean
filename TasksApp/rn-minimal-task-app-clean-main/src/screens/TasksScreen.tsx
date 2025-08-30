@@ -272,12 +272,12 @@ function TaskEditor({task,customCategories,onClose,onSave,onDelete,onAddCustomCa
                          style={[editorStyles.input,{paddingVertical:10,color:colors.text}]}
                        />
                     </View>
-                    <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:8,bottom:8,left:8,right:8}}><Text style={{color:'#a3a3aa',fontSize:18}}>⋯</Text></TouchableOpacity>
+                                         <TouchableOpacity onPress={()=>removeSub(s.id)} hitSlop={{top:16,bottom:16,left:16,right:16}} style={{padding:8}}><Text style={{color:'#ef4444',fontSize:24,fontWeight:'bold'}}>×</Text></TouchableOpacity>
                   </View>
                 ))}
-                               <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginLeft:spacing(1)}}>
-                  <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
-                </TouchableOpacity>
+                                                               <TouchableOpacity onPress={addSub} style={{marginTop:spacing(0.25), marginBottom:spacing(1), paddingVertical:spacing(0.75), paddingHorizontal:spacing(1)}}>
+                   <Text style={{color:colors.accent,fontWeight:'700',fontSize:16}}>+ Добавить цель</Text>
+                 </TouchableOpacity>
               </View>
               )}
 
