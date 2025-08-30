@@ -92,43 +92,40 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCateg
        <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
          {task.done ? (
            <>
-             <Text style={styles.footerText}>
-               Завершено {new Date().toLocaleDateString()}
-             </Text>
-             <Text style={styles.footerText}>
-               {(() => {
-                 const createdTime = new Date(task.createdAt).getTime();
-                 const completedTime = new Date().getTime();
-                 const durationMs = completedTime - createdTime;
-                 const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
-                 const durationDays = Math.floor(durationHours / 24);
-                 
-                 if (durationDays > 0) {
-                   return `Выполнено за ${durationDays} дн.`;
-                 } else {
-                   const durationMinutes = Math.floor(durationMs / (1000 * 60));
-                   if (durationHours > 0) {
-                     return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
-                   } else {
-                     return `Выполнено за ${durationMinutes}м`;
-                   }
-                 }
-               })()}
-             </Text>
+                           <Text style={styles.footerText}>
+                Завершено {task.completedAt ? new Date(task.completedAt).toLocaleDateString() : new Date().toLocaleDateString()}
+              </Text>
+              <Text style={styles.footerText}>
+                {(() => {
+                  const createdTime = new Date(task.createdAt).getTime();
+                  const completedTime = task.completedAt ? new Date(task.completedAt).getTime() : new Date().getTime();
+                  const durationMs = completedTime - createdTime;
+                  const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                  const durationDays = Math.floor(durationHours / 24);
+                  
+                  if (durationDays > 0) {
+                    return `Выполнено за ${durationDays} дн.`;
+                  } else {
+                    const durationMinutes = Math.floor(durationMs / (1000 * 60));
+                    if (durationHours > 0) {
+                      return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+                    } else {
+                      return `Выполнено за ${durationMinutes}м`;
+                    }
+                  }
+                })()}
+              </Text>
            </>
-         ) : (
-           <>
-             <Text style={styles.footerText}>
-               Создано {new Date(task.createdAt).toLocaleDateString()}
-             </Text>
-             <Text style={styles.footerText}>
-               ·
-             </Text>
-             <Text style={styles.footerText}>
-               {task.updatedAt ? `Обновлено ${new Date(task.updatedAt).toLocaleDateString()}` : ''}
-             </Text>
-           </>
-         )}
+                   ) : (
+            <>
+              <Text style={styles.footerText}>
+                Создано {new Date(task.createdAt).toLocaleDateString()}
+              </Text>
+              <Text style={styles.footerText}>
+                {task.updatedAt ? `Обновлено ${new Date(task.updatedAt).toLocaleDateString()}` : ''}
+              </Text>
+            </>
+          )}
        </View>
       </Animated.View>
     </View>
