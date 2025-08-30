@@ -4,9 +4,9 @@ import{colors,radius,spacing,font}from'../theme';
 import CategoryPill from './CategoryPill';
 import type{Task,Subtask,CategoryKey}from'../types';
 
-interface Props{task:Task;onToggle:(id:string)=>void;onToggleSub:(taskId:string,subId:string)=>void;onDelete:(id:string)=>void;}
+interface Props{task:Task;onToggle:(id:string)=>void;onToggleSub:(taskId:string,subId:string)=>void;onDelete:(id:string)=>void;customCategories?:string[];}
 
-export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
+export default function TaskItem({task,onToggle,onToggleSub,onDelete,customCategories=[]}:Props){
   const[open,setOpen]=useState(Boolean(task.subtasks?.length));
   useEffect(()=>{if((task.subtasks?.length||0)>0&&!open){setOpen(true);}},[task.subtasks?.length]);
   const toggleOpen=()=>{LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);setOpen(v=>!v);} ;
@@ -47,7 +47,7 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
        </View>
 
       <View style={{flexDirection:'row',gap:8,flexWrap:'wrap',marginBottom:spacing(1)}}>
-        {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c}/>))}
+        {task.categories.map((c:CategoryKey)=>(<CategoryPill key={c} category={c} customCategories={customCategories}/>))}
       </View>
 
              <View style={{flexDirection:'row',gap:spacing(1.5),flexWrap:'wrap',marginBottom:spacing(1)}}>
@@ -90,34 +90,42 @@ export default function TaskItem({task,onToggle,onToggleSub,onDelete}:Props){
 
              <View style={{height:1,backgroundColor:colors.border,marginVertical:spacing(1)}}/>
        <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-         <Text style={styles.footerText}>
-           {task.done 
-             ? `Завершено ${new Date().toLocaleDateString()}`
-             : `Создано ${new Date(task.createdAt).toLocaleDateString()}${task.updatedAt ? ` · Обновлено ${new Date(task.updatedAt).toLocaleDateString()}` : ''}`
-           }
-         </Text>
-         {task.done && (
-           <Text style={styles.footerText}>
-             {(() => {
-               const createdTime = new Date(task.createdAt).getTime();
-               const completedTime = new Date().getTime();
-               const durationMs = completedTime - createdTime;
-               const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
-               const durationDays = Math.floor(durationHours / 24);
-               
-                               if (durationDays > 0) {
-                  return `Выполнено за ${durationDays} дн.`;
-                } else {
-                  const durationMinutes = Math.floor(durationMs / (1000 * 60));
-                  if (durationHours > 0) {
-                    return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+         {task.done ? (
+           <>
+                           <Text style={styles.footerText}>
+                Завершено {task.completedAt ? new Date(task.completedAt).toLocaleDateString() : new Date().toLocaleDateString()}
+              </Text>
+              <Text style={styles.footerText}>
+                {(() => {
+                  const createdTime = new Date(task.createdAt).getTime();
+                  const completedTime = task.completedAt ? new Date(task.completedAt).getTime() : new Date().getTime();
+                  const durationMs = completedTime - createdTime;
+                  const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+                  const durationDays = Math.floor(durationHours / 24);
+                  
+                  if (durationDays > 0) {
+                    return `Выполнено за ${durationDays} дн.`;
                   } else {
-                    return `Выполнено за ${durationMinutes}м`;
+                    const durationMinutes = Math.floor(durationMs / (1000 * 60));
+                    if (durationHours > 0) {
+                      return `Выполнено за ${durationHours}ч ${durationMinutes % 60}м`;
+                    } else {
+                      return `Выполнено за ${durationMinutes}м`;
+                    }
                   }
-                }
-             })()}
-           </Text>
-         )}
+                })()}
+              </Text>
+           </>
+                   ) : (
+            <>
+              <Text style={styles.footerText}>
+                Создано {new Date(task.createdAt).toLocaleDateString()}
+              </Text>
+              <Text style={styles.footerText}>
+                {task.updatedAt ? `Обновлено ${new Date(task.updatedAt).toLocaleDateString()}` : ''}
+              </Text>
+            </>
+          )}
        </View>
       </Animated.View>
     </View>

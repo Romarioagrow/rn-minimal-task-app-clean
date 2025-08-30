@@ -1,4 +1,4 @@
-export type CategoryKey = 'work'|'home'|'global'|'habit'|'personal'|'urgent';
+export type CategoryKey = 'work'|'home'|'global'|'habit'|'personal'|'urgent'|string;
 
 export interface Subtask {
   id: string;
@@ -19,4 +19,5 @@ export interface Task {
   done: boolean;
   createdAt: string;
   updatedAt?: string;
+  completedAt?: string; // время завершения задачи
 }

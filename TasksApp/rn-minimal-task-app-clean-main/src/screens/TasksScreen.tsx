@@ -5,7 +5,7 @@ import{colors,spacing}from'../theme';
 import TaskItem from'../components/TaskItem';
 
 import type{Task,CategoryKey}from'../types';
-import{loadTasks,saveTasks}from'../storage';
+import{loadTasks,saveTasks,loadCustomCategories,saveCustomCategories}from'../storage';
 
 const defaultData:Task[]=[
   {id:'1',title:'Созвон',categories:['work'],dueAt:new Date().toISOString(),done:false,createdAt:new Date().toISOString()},
@@ -22,13 +22,47 @@ const[editorOpen,setEditorOpen]=useState(false);
 const[editingTaskId,setEditingTaskId]=useState<string|null>(null);
 const[draftTask,setDraftTask]=useState<Task|null>(null);
 const[filter,setFilter]=useState<'all'|CategoryKey>('all');
-
+const[customCategories,setCustomCategories]=useState<string[]>([]);
 useEffect(()=>{(async()=>{const stored=await loadTasks();setTasks(stored.length?stored:defaultData);})();},[]);
 useEffect(()=>{saveTasks(tasks);},[tasks]);
+useEffect(()=>{(async()=>{const stored=await loadCustomCategories();setCustomCategories(stored);})();},[]);
+useEffect(()=>{saveCustomCategories(customCategories);},[customCategories]);
+
+
 
 const list=useMemo(()=>tasks.filter(t=>filter==='all'?true:t.categories.includes(filter)),[tasks,filter]);
+
+// Создаем динамический объект меток, включающий пользовательские категории
+const getCategoryLabels = useCallback(() => {
+  const baseLabels: Record<CategoryKey, string> = {
+    work: 'Работа',
+    home: 'Дом', 
+    global: 'Глобальное',
+    habit: 'Повтор',
+    personal: 'Личное',
+    urgent: 'Срочно'
+  };
+  
+  // Добавляем пользовательские категории
+  customCategories.forEach(cat => {
+    baseLabels[cat] = cat;
+  });
+  
+  return baseLabels;
+}, [customCategories]);
+
 const toggle=useCallback((id:string)=>{
-  setTasks(prev=>prev.map(t=>t.id===id?{...t,done:!t.done,updatedAt:new Date().toISOString()}:t));
+  setTasks(prev=>prev.map(t=>{
+    if(t.id!==id) return t;
+    const newDone = !t.done;
+    return {
+      ...t,
+      done: newDone,
+      updatedAt: new Date().toISOString(),
+      // Устанавливаем время завершения только при первом завершении
+      completedAt: newDone && !t.completedAt ? new Date().toISOString() : t.completedAt
+    };
+  }));
 },[]);
 const toggleSub=useCallback((taskId:string,subId:string)=>{
   setTasks(prev=>prev.map(t=>{
@@ -44,8 +78,12 @@ const handleDelete=useCallback((id:string)=>{
   setTasks(prev=>prev.filter(t=>t.id!==id));
 },[]);
 const renderItem=useCallback(({item}:{item:Task})=> (
-  <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub} onDelete={handleDelete}/>
-),[toggle,toggleSub]);
+  <TaskItem task={item} onToggle={toggle} onToggleSub={toggleSub} onDelete={handleDelete} customCategories={customCategories}/>
+),[toggle,toggleSub,customCategories]);
+
+
+
+
 
 return(
   <SafeAreaView style={styles.safe} edges={['top','left','right','bottom']}>
@@ -53,15 +91,23 @@ return(
 
       <Text style={styles.h1}>Задачи</Text>
       <Text style={styles.caption}>Всего: {list.length} • Активных: {list.filter(t=>!t.done).length}</Text>
-      <View style={styles.filters}>
-        <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
-          <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
-        </TouchableOpacity>
-        {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
-          <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
-            <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{LABELS[c as CategoryKey]||String(c)}</Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.filtersContainer}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          style={{ maxHeight: 120 }}
+          nestedScrollEnabled={true}
+        >
+          <View style={styles.filters}>
+            <TouchableOpacity key={'all'} style={[styles.fbtn,filter==='all'&&styles.fbtnOn]} onPress={()=>setFilter('all')}>
+              <Text style={[styles.ftext,filter==='all'&&styles.ftextOn]}>Все</Text>
+            </TouchableOpacity>
+            {Array.from(new Set(tasks.flatMap(t=>t.categories))).map((c)=> (
+              <TouchableOpacity key={c} style={[styles.fbtn,filter===c&&styles.fbtnOn]} onPress={()=>setFilter(c as CategoryKey)}>
+                <Text style={[styles.ftext,filter===c&&styles.ftextOn]}>{getCategoryLabels()[c as CategoryKey]||String(c)}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
       <FlatList
         data={list}
@@ -82,7 +128,8 @@ return(
           categories:[],
           done:false,
           createdAt:new Date().toISOString(),
-          subtasks:[]
+          subtasks:[],
+          // Не устанавливаем updatedAt при создании новой задачи
         };
         setDraftTask(draft);
         setEditingTaskId(null);
@@ -93,6 +140,7 @@ return(
       {editorOpen?(
         <TaskEditor
           task={(editingTaskId?tasks.find(t=>t.id===editingTaskId):draftTask)!}
+          customCategories={customCategories}
           onClose={()=>{setEditorOpen(false); setEditingTaskId(null); setDraftTask(null);}}
           onSave={(updated)=>{
             setTasks(prev=>{
@@ -107,6 +155,11 @@ return(
             }
             setEditorOpen(false); setEditingTaskId(null); setDraftTask(null);
           }}
+          onAddCustomCategory={(category) => {
+            if (!customCategories.includes(category)) {
+              setCustomCategories(prev => [...prev, category]);
+            }
+          }}
         />
       ):null}
     </View>
@@ -119,8 +172,9 @@ safe:{flex:1,backgroundColor:colors.bg},
 container:{flex:1,paddingHorizontal:spacing(1.5),paddingTop:spacing(1)},
 h1:{color:'#ffffff',fontSize:24,fontWeight:'800'},
 caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontWeight:'400'},
-filters:{flexDirection:'row',flexWrap:'wrap',gap:6,marginBottom:spacing(1.5)},
-fbtn:{paddingHorizontal:spacing(1),paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e'},
+filtersContainer:{marginBottom:spacing(2)},
+filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',justifyContent:'center',paddingHorizontal:spacing(1),paddingVertical:spacing(1)},
+fbtn:{paddingHorizontal:spacing(1),paddingVertical:6,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e',marginBottom:4},
 fbtnOn:{backgroundColor:'#1f2937'},
 ftext:{color:'#a3a3aa',fontSize:12,fontWeight:'500'},
 ftextOn:{color:'#ffffff',fontWeight:'700'},
@@ -129,7 +183,7 @@ fabPlus:{fontSize:24,fontWeight:'700'}
 });
 
 // Редактор задачи — простая модалка без сторонних библиотек
-function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;onSave:(t:Task)=>void;onDelete:()=>void}){
+function TaskEditor({task,customCategories,onClose,onSave,onDelete,onAddCustomCategory}:{task:Task;customCategories:string[];onClose:()=>void;onSave:(t:Task)=>void;onDelete:()=>void;onAddCustomCategory:(category:string)=>void}){
   const [title,setTitle]=useState(task.title);
   const [notes,setNotes]=useState(task.notes||'');
   const [categories,setCategories]=useState<CategoryKey[]>(task.categories);
@@ -146,12 +200,24 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
    const [settingsOpen,setSettingsOpen]=useState(false);
    const [categoriesOpen,setCategoriesOpen]=useState(false);
    const [goalsOpen,setGoalsOpen]=useState(false);
+   const [customCategoryInput,setCustomCategoryInput]=useState('');
+   const [showCustomInput,setShowCustomInput]=useState(false);
 
   const CATEGORY_LABELS:Record<CategoryKey,string>={work:'Работа',home:'Дом',global:'Глобальное',habit:'Повтор',personal:'Личное',urgent:'Срочно'};
   const toggleCategory=(c:CategoryKey)=>setCategories(prev=>prev.includes(c)?prev.filter(x=>x!==c):[...prev,c]);
   const addSub=()=>setSubtasks(prev=>[...prev,{id:String(Date.now()),title:'',done:false}]);
   const updateSub=(id:string,title:string)=>setSubtasks(prev=>prev.map(s=>s.id===id?{...s,title}:s));
   const removeSub=(id:string)=>setSubtasks(prev=>prev.filter(s=>s.id!==id));
+  
+  const addCustomCategory = () => {
+    if (customCategoryInput.trim()) {
+      const newCategory = customCategoryInput.trim();
+      setCategories(prev => [...prev, newCategory]);
+      onAddCustomCategory(newCategory);
+      setCustomCategoryInput('');
+      setShowCustomInput(false);
+    }
+  };
 
   const cycleRepeat=()=>{
     const order:[Task['repeat'],Task['repeat'],Task['repeat'],Task['repeat']]=[null,'daily','weekly','monthly'];
@@ -236,7 +302,45 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                        </TouchableOpacity>
                      );
                    })}
+                   
+                   {/* Кнопка "Своя" */}
+                   <TouchableOpacity 
+                     onPress={() => setShowCustomInput(!showCustomInput)} 
+                     style={[editorStyles.catChip,{borderColor:colors.accent,backgroundColor:'transparent'}]}
+                   >
+                     <Text style={[editorStyles.catChipText,{color:colors.accent}]}>Своя</Text>
+                   </TouchableOpacity>
+                   
+                   {/* Пользовательские категории */}
+                   {categories.filter(c => !['home','work','global','personal','habit','urgent'].includes(c)).map(c => {
+                     const selected = categories.includes(c);
+                     return (
+                       <TouchableOpacity key={c} onPress={()=>toggleCategory(c)} style={[editorStyles.catChip,{borderColor:selected?colors.accent:colors.border,backgroundColor:selected?`${colors.accent}22`:'transparent'}]}>
+                         <Text style={[editorStyles.catChipText,{color:selected?colors.accent:colors.text}]}>{c}</Text>
+                       </TouchableOpacity>
+                     );
+                   })}
                  </View>
+                 
+                 {/* Поле ввода для новой категории */}
+                 {showCustomInput && (
+                   <View style={{flexDirection:'row',gap:spacing(1),marginTop:spacing(1)}}>
+                     <TextInput
+                       value={customCategoryInput}
+                       onChangeText={setCustomCategoryInput}
+                       placeholder="Название категории"
+                       placeholderTextColor={colors.subtext}
+                       style={[editorStyles.input,{flex:1,color:colors.text}]}
+                       onSubmitEditing={addCustomCategory}
+                     />
+                     <TouchableOpacity 
+                       onPress={addCustomCategory}
+                       style={[editorStyles.catChip,{borderColor:colors.accent,backgroundColor:colors.accent}]}
+                     >
+                       <Text style={[editorStyles.catChipText,{color:'#000'}]}>+</Text>
+                     </TouchableOpacity>
+                   </View>
+                 )}
                </View>
              )}
 
@@ -355,7 +459,10 @@ function TaskEditor({task,onClose,onSave,onDelete}:{task:Task;onClose:()=>void;o
                   reminderMinutesBefore: typeof reminder==='number'?reminder:undefined,
                   priority:priority||undefined,
                   subtasks:subtasks.filter(s=>s.title.trim().length>0),
-                  updatedAt:new Date().toISOString()
+                  // Устанавливаем updatedAt только при редактировании существующей задачи
+                  updatedAt: task.updatedAt ? new Date().toISOString() : undefined,
+                  // Сохраняем время завершения если задача была завершена
+                  completedAt: task.completedAt
                 })}><Text style={{color:colors.accent,fontWeight:'800'}}>Сохранить</Text></TouchableOpacity>
               </View>
             </View>
