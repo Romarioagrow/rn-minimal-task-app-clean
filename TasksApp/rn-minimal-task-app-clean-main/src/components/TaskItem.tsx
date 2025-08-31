@@ -212,7 +212,7 @@ const styles=StyleSheet.create({
   },
   deleteText:{
     color:'#fff',
-    fontFamily:'PTSansCaption-Bold'
+    fontFamily:'Inter_700Bold'
   },
   
   // Основная карточка
@@ -251,7 +251,7 @@ const styles=StyleSheet.create({
   titleLarge:{
     color:colors.text,
     fontSize:22,
-    fontFamily:'PTSansCaption-Bold'
+    fontFamily:'Inter_700Bold'
   },
   done:{
     color:colors.subtext,
@@ -265,7 +265,7 @@ const styles=StyleSheet.create({
   blockTitle:{
     color:colors.text,
     fontSize:16,
-    fontFamily:'PTSansCaption-Bold',
+    fontFamily:'Inter_700Bold',
     marginBottom:spacing(1)
   },
   
@@ -295,14 +295,14 @@ const styles=StyleSheet.create({
   planningText:{
     color:colors.subtext,
     fontSize:14,
-    fontFamily:'PTSansCaption-Regular'
+    fontFamily:'Inter_400Regular'
   },
   
   // Блок заметок
   notesText:{
     color:colors.subtext,
     fontSize:14,
-    fontFamily:'PTSansCaption-Regular',
+    fontFamily:'Inter_400Regular',
     lineHeight:20
   },
   
@@ -334,7 +334,7 @@ const styles=StyleSheet.create({
   goalText:{
     color:colors.text,
     fontSize:14,
-    fontFamily:'PTSansCaption-Regular',
+    fontFamily:'Inter_400Regular',
     flex:1
   },
   goalDone:{
@@ -371,6 +371,6 @@ const styles=StyleSheet.create({
   footerText:{
     color:colors.subtext,
     fontSize:12,
-    fontFamily:'PTSansCaption-Regular'
+    fontFamily:'Inter_400Regular'
   }
 })
