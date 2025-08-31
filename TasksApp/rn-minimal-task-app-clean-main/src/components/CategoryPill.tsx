@@ -29,7 +29,13 @@ export default function CategoryPill({ category, customCategories = [] }:{ categ
   );
 }
 
-const styles=StyleSheet.create({
-  pill:{paddingVertical:3,paddingHorizontal:spacing(1),borderRadius:radius.md,alignSelf:'flex-start',borderWidth:1},
-  text:{fontSize:10,fontFamily:'PTSansCaption-Bold',letterSpacing:0.5}
+const styles = StyleSheet.create({
+  pill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignSelf: 'flex-start'
+  },
+  text:{fontSize:10,fontFamily:'Inter-Bold',letterSpacing:0.5}
 });

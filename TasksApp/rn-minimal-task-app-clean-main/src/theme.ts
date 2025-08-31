@@ -32,16 +32,24 @@ export const font = {
   text: 14,
   small: 11,
   
-  // Семейства шрифтов - используем PT Sans Caption
+  // Семейства шрифтов - используем Google Fonts
   family: {
-    // Основной шрифт - PT Sans Caption
-    primary: 'PTSansCaption-Regular',
-    // Жирный шрифт - PT Sans Caption Bold
-    bold: 'PTSansCaption-Bold',
-    // Альтернативный шрифт
-    secondary: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
-    // Моноширинный шрифт
-    mono: Platform.OS === 'ios' ? 'SF Mono' : 'Roboto Mono'
+    // Основной шрифт - Inter
+    primary: 'Inter_400Regular',
+    // Жирный шрифт - Inter Bold
+    bold: 'Inter_700Bold',
+    // Средний вес - Inter Medium
+    medium: 'Inter_500Medium',
+    // Полужирный - Inter SemiBold
+    semibold: 'Inter_600SemiBold',
+    // Альтернативный шрифт - Poppins
+    secondary: 'Poppins_400Regular',
+    // Жирный альтернативный - Poppins Bold
+    secondaryBold: 'Poppins_700Bold',
+    // Робото для технического текста
+    mono: 'Roboto_400Regular',
+    // Open Sans для заголовков
+    display: 'OpenSans_700Bold'
   },
   
   // Веса шрифтов
