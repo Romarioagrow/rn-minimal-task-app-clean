@@ -1,27 +1,39 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useFonts, Inter_400Regular, Inter_700Bold, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
-import { Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import { Roboto_400Regular } from '@expo-google-fonts/roboto';
-import { OpenSans_700Bold } from '@expo-google-fonts/open-sans';
+import * as Font from 'expo-font';
 import TasksScreen from './src/screens/TasksScreen';
 
 export default function App() {
-  const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular,
-    Inter_700Bold,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Poppins_400Regular,
-    Poppins_700Bold,
-    Roboto_400Regular,
-    OpenSans_700Bold,
-  });
+  const [fontsLoaded, setFontsLoaded] = React.useState(false);
 
-  // Если шрифты еще загружаются, показываем простой экран
-  if (!fontsLoaded && !fontError) {
+  React.useEffect(() => {
+    async function loadFonts() {
+      try {
+        await Font.loadAsync({
+          'Inter-Regular': require('./assets/fonts/Inter-Regular.ttf'),
+          'Inter-Medium': require('./assets/fonts/Inter-Medium.ttf'),
+          'Inter-SemiBold': require('./assets/fonts/Inter-SemiBold.ttf'),
+          'Inter-Bold': require('./assets/fonts/Inter-Bold.ttf'),
+          'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
+          'Poppins-Medium': require('./assets/fonts/Poppins-Medium.ttf'),
+          'Poppins-SemiBold': require('./assets/fonts/Poppins-SemiBold.ttf'),
+          'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+        });
+        setFontsLoaded(true);
+        console.log('Шрифты загружены успешно!');
+      } catch (error) {
+        console.error('Ошибка загрузки шрифтов:', error);
+        setFontsLoaded(true); // Продолжаем работу даже с ошибкой
+      }
+    }
+    
+    loadFonts();
+  }, []);
+
+  // Если шрифты еще загружаются, показываем экран загрузки
+  if (!fontsLoaded) {
     return (
       <SafeAreaProvider>
         <StatusBar style='light' />
@@ -30,11 +42,6 @@ export default function App() {
         </View>
       </SafeAreaProvider>
     );
-  }
-
-  // Если есть ошибка загрузки шрифтов, логируем но продолжаем работу
-  if (fontError) {
-    console.warn('Ошибка загрузки Google Fonts:', fontError);
   }
 
   return (

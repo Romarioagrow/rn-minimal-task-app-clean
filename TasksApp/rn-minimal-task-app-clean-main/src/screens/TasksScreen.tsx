@@ -211,16 +211,16 @@ return(
 const styles=StyleSheet.create({
 safe:{flex:1,backgroundColor:colors.bg},
 container:{flex:1,paddingHorizontal:spacing(1.5),paddingTop:spacing(1)},
-h1:{color:'#ffffff',fontSize:24,fontFamily:'Inter_700Bold'},
-caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontFamily:'Inter_400Regular'},
+h1:{color:'#ffffff',fontSize:24,fontFamily:'Inter-Bold'},
+caption:{color:'#a3a3aa',marginBottom:spacing(1),fontSize:14,fontFamily:'Inter-Regular'},
 filtersContainer:{marginBottom:spacing(2)},
 filters:{flexDirection:'row',flexWrap:'wrap',gap:6,alignItems:'flex-start',justifyContent:'center',paddingHorizontal:spacing(1),paddingVertical:spacing(1)},
 fbtn:{paddingHorizontal:spacing(1),paddingVertical:6,borderRadius:999,borderWidth:1,borderColor:'#2a2a2e',marginBottom:4},
 fbtnOn:{backgroundColor:'#1f2937'},
-ftext:{color:'#a3a3aa',fontSize:12,fontFamily:'Inter_400Regular'},
-ftextOn:{color:'#ffffff',fontFamily:'Inter_700Bold'},
+ftext:{color:'#a3a3aa',fontSize:12,fontFamily:'Inter-Regular'},
+ftextOn:{color:'#ffffff',fontFamily:'Inter-Bold'},
 fab:{position:'absolute',right:spacing(2),bottom:spacing(2),width:48,height:48,borderRadius:24,backgroundColor:'#ffcc00',alignItems:'center',justifyContent:'center'},
-fabPlus:{fontSize:24,fontFamily:'Inter_700Bold'}
+fabPlus:{fontSize:24,fontFamily:'Inter-Bold'}
 });
 
 // Редактор задачи — простая модалка без сторонних библиотек
@@ -533,17 +533,17 @@ function Input({value,onChangeText,placeholder,style,multiline}:{value:string;on
    backdrop:{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'#000000aa',justifyContent:'flex-end'},
    sheet:{backgroundColor:colors.card,borderTopLeftRadius:16,borderTopRightRadius:16,padding:spacing(1.5),gap:spacing(1)},
    settingsToggle:{paddingVertical:spacing(1),paddingHorizontal:spacing(1.5),borderRadius:8,borderWidth:1,borderColor:colors.border,backgroundColor:'#111214',marginBottom:spacing(1)},
-       settingsToggleText:{color:colors.text,fontSize:16,fontFamily:'Inter_700Bold'},
-        sectionTitle:{color:colors.text,fontSize:17,fontFamily:'Inter_700Bold',marginBottom:spacing(1)},
+       settingsToggleText:{color:colors.text,fontSize:16,fontFamily:'Inter-Bold'},
+        sectionTitle:{color:colors.text,fontSize:17,fontFamily:'Inter-Bold',marginBottom:spacing(1)},
   chip:{paddingHorizontal:10,paddingVertical:4,borderRadius:999,borderWidth:1,borderColor:colors.border},
   chipOn:{backgroundColor:'#1f2937',borderColor:'#1f2937'},
-     chipText:{color:colors.subtext,fontSize:12,fontFamily:'Inter_400Regular'},
-   chipTextOn:{color:'#fff',fontFamily:'Inter_700Bold'},
+     chipText:{color:colors.subtext,fontSize:12,fontFamily:'Inter-Regular'},
+   chipTextOn:{color:'#fff',fontFamily:'Inter-Bold'},
   input:{borderWidth:1,borderColor:colors.border,borderRadius:8,paddingHorizontal:10,paddingVertical:8},
   settingsCard:{backgroundColor:'#111214',borderRadius:14,borderWidth:1,borderColor:colors.border,marginBottom:spacing(2)},
   settingsRow:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:spacing(1.5),paddingVertical:spacing(1),borderBottomWidth:1,borderBottomColor:'#1c1d22'},
-     settingsLabel:{color:colors.text,fontSize:14,fontFamily:'Inter_700Bold'},
-   settingsValue:{color:colors.text,fontSize:14,fontFamily:'Inter_700Bold'},
+     settingsLabel:{color:colors.text,fontSize:14,fontFamily:'Inter-Bold'},
+   settingsValue:{color:colors.text,fontSize:14,fontFamily:'Inter-Bold'},
    catChip:{paddingHorizontal:12,paddingVertical:6,borderRadius:999,borderWidth:1},
-   catChipText:{fontSize:14,fontFamily:'Inter_700Bold'}
+   catChipText:{fontSize:14,fontFamily:'Inter-Bold'}
 });
