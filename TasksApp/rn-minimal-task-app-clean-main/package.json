@@ -10,6 +10,10 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.1",
+    "@expo-google-fonts/open-sans": "^0.4.1",
+    "@expo-google-fonts/poppins": "^0.4.0",
+    "@expo-google-fonts/roboto": "^0.4.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "expo": "~51.0.28",
     "expo-font": "^13.3.2",

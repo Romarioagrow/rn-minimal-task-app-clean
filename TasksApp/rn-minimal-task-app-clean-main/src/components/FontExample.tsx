@@ -1,109 +1,123 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors, spacing, font } from '../theme';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { colors, spacing } from '../theme';
 
 export default function FontExample() {
   return (
-    <View style={styles.container}>
-      {/* Заголовок с Inter Bold */}
-      <Text style={styles.mainTitle}>
-        Красивые шрифты в приложении
-      </Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Тест Шрифтов</Text>
       
-      {/* Подзаголовок с Poppins */}
-      <Text style={styles.subtitle}>
-        Современный и элегантный дизайн
-      </Text>
-      
-      {/* Основной текст с Inter */}
-      <Text style={styles.bodyText}>
-        Это пример использования красивых шрифтов Inter и Poppins в React Native приложении. 
-        Inter отлично подходит для основного текста, а Poppins - для заголовков и акцентов.
-      </Text>
-      
-      {/* Акцентный текст */}
-      <Text style={styles.accentText}>
-        ✨ Красивый и современный интерфейс
-      </Text>
-      
-      {/* Метаданные */}
-      <View style={styles.metaContainer}>
-        <Text style={styles.metaText}>Inter Regular 400</Text>
-        <Text style={styles.metaText}>Inter Medium 500</Text>
-        <Text style={styles.metaText}>Inter SemiBold 600</Text>
-        <Text style={styles.metaText}>Inter Bold 700</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Inter Font Family</Text>
+        <Text style={styles.interRegular}>Inter Regular - Обычный текст</Text>
+        <Text style={styles.interMedium}>Inter Medium - Средний вес</Text>
+        <Text style={styles.interSemiBold}>Inter SemiBold - Полужирный</Text>
+        <Text style={styles.interBold}>Inter Bold - Жирный текст</Text>
       </View>
-      
-      <View style={styles.metaContainer}>
-        <Text style={styles.poppinsMeta}>Poppins Regular</Text>
-        <Text style={styles.poppinsMeta}>Poppins Medium</Text>
-        <Text style={styles.poppinsMeta}>Poppins SemiBold</Text>
-        <Text style={styles.poppinsMeta}>Poppins Bold</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Poppins Font Family</Text>
+        <Text style={styles.poppinsRegular}>Poppins Regular - Обычный текст</Text>
+        <Text style={styles.poppinsMedium}>Poppins Medium - Средний вес</Text>
+        <Text style={styles.poppinsSemiBold}>Poppins SemiBold - Полужирный</Text>
+        <Text style={styles.poppinsBold}>Poppins Bold - Жирный текст</Text>
       </View>
-    </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Системные шрифты (для сравнения)</Text>
+        <Text style={styles.systemRegular}>System Regular - Системный обычный</Text>
+        <Text style={styles.systemBold}>System Bold - Системный жирный</Text>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: colors.bg,
+    padding: spacing(2),
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: 'Inter-Bold',
+    color: colors.text,
+    marginBottom: spacing(3),
+    textAlign: 'center',
+  },
+  section: {
+    marginBottom: spacing(3),
     padding: spacing(2),
     backgroundColor: colors.card,
     borderRadius: 12,
-    margin: spacing(2),
   },
-  mainTitle: {
-    fontFamily: 'Inter',
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing(1),
-  },
-  subtitle: {
-    fontFamily: 'Poppins',
+  sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: 'Inter-SemiBold',
     color: colors.accent,
-    marginBottom: spacing(2),
-  },
-  bodyText: {
-    fontFamily: 'Inter',
-    fontSize: 16,
-    fontWeight: '400',
-    color: colors.text,
-    lineHeight: 24,
-    marginBottom: spacing(2),
-  },
-  accentText: {
-    fontFamily: 'Poppins',
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.accent,
-    marginBottom: spacing(2),
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing(1),
     marginBottom: spacing(1),
   },
-  metaText: {
-    fontFamily: 'Inter',
-    fontSize: 12,
-    fontWeight: '400',
-    color: colors.subtext,
-    backgroundColor: colors.border,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+  // Inter fonts
+  interRegular: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: colors.text,
+    marginBottom: spacing(0.5),
   },
-  poppinsMeta: {
-    fontFamily: 'Poppins',
-    fontSize: 12,
-    fontWeight: '500',
+  interMedium: {
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  interSemiBold: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  interBold: {
+    fontSize: 16,
+    fontFamily: 'Inter-Bold',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  // Poppins fonts
+  poppinsRegular: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  poppinsMedium: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Medium',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  poppinsSemiBold: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  poppinsBold: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Bold',
+    color: colors.text,
+    marginBottom: spacing(0.5),
+  },
+  // System fonts
+  systemRegular: {
+    fontSize: 16,
+    fontWeight: 'normal',
     color: colors.subtext,
-    backgroundColor: colors.border,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    marginBottom: spacing(0.5),
+  },
+  systemBold: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.subtext,
+    marginBottom: spacing(0.5),
   },
 });
